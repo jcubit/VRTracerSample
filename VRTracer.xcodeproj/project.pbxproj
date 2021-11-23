@@ -1,0 +1,412 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1135217E274C39AE0037C1F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1135217D274C39AE0037C1F2 /* AppDelegate.swift */; };
+		11352180274C39AE0037C1F2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1135217F274C39AE0037C1F2 /* ViewController.swift */; };
+		11352182274C39AF0037C1F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11352181274C39AF0037C1F2 /* Assets.xcassets */; };
+		11352185274C39AF0037C1F2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11352183274C39AF0037C1F2 /* Main.storyboard */; };
+		11352190274C3A320037C1F2 /* ImgProX in Frameworks */ = {isa = PBXBuildFile; productRef = 1135218F274C3A320037C1F2 /* ImgProX */; };
+		11352193274C480D0037C1F2 /* 106 in Resources */ = {isa = PBXBuildFile; fileRef = 11352191274C44260037C1F2 /* 106 */; };
+		11352195274CF6180037C1F2 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11352194274CF6180037C1F2 /* Renderer.swift */; };
+		11352197274CF68B0037C1F2 /* Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11352196274CF68B0037C1F2 /* Scene.swift */; };
+		11352199274CF6C00037C1F2 /* ImageFillTest.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11352198274CF6C00037C1F2 /* ImageFillTest.metal */; };
+		1135219B274CF6DF0037C1F2 /* blit.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1135219A274CF6DF0037C1F2 /* blit.metal */; };
+		1135219D274CF72A0037C1F2 /* rayIntersection.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1135219C274CF72A0037C1F2 /* rayIntersection.metal */; };
+		113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B8F274D0679003A03E6 /* flythrough_camera.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1135217A274C39AE0037C1F2 /* VRTracer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VRTracer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1135217D274C39AE0037C1F2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1135217F274C39AE0037C1F2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		11352181274C39AF0037C1F2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		11352184274C39AF0037C1F2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		11352186274C39AF0037C1F2 /* VRTracer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VRTracer.entitlements; sourceTree = "<group>"; };
+		1135218D274C39CB0037C1F2 /* ImgProX */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ImgProX; path = ../ImgProX; sourceTree = "<group>"; };
+		11352191274C44260037C1F2 /* 106 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = 106; path = ../Resources/Data/106; sourceTree = "<group>"; };
+		11352194274CF6180037C1F2 /* Renderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		11352196274CF68B0037C1F2 /* Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scene.swift; sourceTree = "<group>"; };
+		11352198274CF6C00037C1F2 /* ImageFillTest.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageFillTest.metal; sourceTree = "<group>"; };
+		1135219A274CF6DF0037C1F2 /* blit.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = blit.metal; sourceTree = "<group>"; };
+		1135219C274CF72A0037C1F2 /* rayIntersection.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = rayIntersection.metal; sourceTree = "<group>"; };
+		113521BE274D03A20037C1F2 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
+		113521BF274D04880037C1F2 /* flythrough_camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flythrough_camera.h; sourceTree = "<group>"; };
+		113E8B8F274D0679003A03E6 /* flythrough_camera.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = flythrough_camera.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		11352177274C39AE0037C1F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11352190274C3A320037C1F2 /* ImgProX in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		11352171274C39AE0037C1F2 = {
+			isa = PBXGroup;
+			children = (
+				11352191274C44260037C1F2 /* 106 */,
+				1135218C274C39CB0037C1F2 /* Packages */,
+				1135217C274C39AE0037C1F2 /* VRTracer */,
+				1135217B274C39AE0037C1F2 /* Products */,
+				1135218E274C3A320037C1F2 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		1135217B274C39AE0037C1F2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1135217A274C39AE0037C1F2 /* VRTracer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1135217C274C39AE0037C1F2 /* VRTracer */ = {
+			isa = PBXGroup;
+			children = (
+				113521BF274D04880037C1F2 /* flythrough_camera.h */,
+				113E8B8F274D0679003A03E6 /* flythrough_camera.c */,
+				1135217D274C39AE0037C1F2 /* AppDelegate.swift */,
+				1135217F274C39AE0037C1F2 /* ViewController.swift */,
+				11352181274C39AF0037C1F2 /* Assets.xcassets */,
+				11352183274C39AF0037C1F2 /* Main.storyboard */,
+				11352186274C39AF0037C1F2 /* VRTracer.entitlements */,
+				11352194274CF6180037C1F2 /* Renderer.swift */,
+				11352196274CF68B0037C1F2 /* Scene.swift */,
+				11352198274CF6C00037C1F2 /* ImageFillTest.metal */,
+				1135219A274CF6DF0037C1F2 /* blit.metal */,
+				1135219C274CF72A0037C1F2 /* rayIntersection.metal */,
+				113521BE274D03A20037C1F2 /* BridgingHeader.h */,
+			);
+			path = VRTracer;
+			sourceTree = "<group>";
+		};
+		1135218C274C39CB0037C1F2 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				1135218D274C39CB0037C1F2 /* ImgProX */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		1135218E274C3A320037C1F2 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		11352179274C39AE0037C1F2 /* VRTracer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 11352189274C39AF0037C1F2 /* Build configuration list for PBXNativeTarget "VRTracer" */;
+			buildPhases = (
+				11352176274C39AE0037C1F2 /* Sources */,
+				11352177274C39AE0037C1F2 /* Frameworks */,
+				11352178274C39AE0037C1F2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VRTracer;
+			packageProductDependencies = (
+				1135218F274C3A320037C1F2 /* ImgProX */,
+			);
+			productName = VRTracer;
+			productReference = 1135217A274C39AE0037C1F2 /* VRTracer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		11352172274C39AE0037C1F2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1310;
+				LastUpgradeCheck = 1310;
+				TargetAttributes = {
+					11352179274C39AE0037C1F2 = {
+						CreatedOnToolsVersion = 13.1;
+					};
+				};
+			};
+			buildConfigurationList = 11352175274C39AE0037C1F2 /* Build configuration list for PBXProject "VRTracer" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 11352171274C39AE0037C1F2;
+			productRefGroup = 1135217B274C39AE0037C1F2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				11352179274C39AE0037C1F2 /* VRTracer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		11352178274C39AE0037C1F2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11352193274C480D0037C1F2 /* 106 in Resources */,
+				11352182274C39AF0037C1F2 /* Assets.xcassets in Resources */,
+				11352185274C39AF0037C1F2 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11352176274C39AE0037C1F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */,
+				11352197274CF68B0037C1F2 /* Scene.swift in Sources */,
+				11352180274C39AE0037C1F2 /* ViewController.swift in Sources */,
+				11352195274CF6180037C1F2 /* Renderer.swift in Sources */,
+				1135219D274CF72A0037C1F2 /* rayIntersection.metal in Sources */,
+				11352199274CF6C00037C1F2 /* ImageFillTest.metal in Sources */,
+				1135219B274CF6DF0037C1F2 /* blit.metal in Sources */,
+				1135217E274C39AE0037C1F2 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		11352183274C39AF0037C1F2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				11352184274C39AF0037C1F2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		11352187274C39AF0037C1F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.6;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		11352188274C39AF0037C1F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.6;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		1135218A274C39AF0037C1F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = VRTracer/VRTracer.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BL7N86LWC5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cubit.VRTracer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/BridgingHeader.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1135218B274C39AF0037C1F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = VRTracer/VRTracer.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BL7N86LWC5;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = cubit.VRTracer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(TARGET_NAME)/BridgingHeader.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		11352175274C39AE0037C1F2 /* Build configuration list for PBXProject "VRTracer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				11352187274C39AF0037C1F2 /* Debug */,
+				11352188274C39AF0037C1F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		11352189274C39AF0037C1F2 /* Build configuration list for PBXNativeTarget "VRTracer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1135218A274C39AF0037C1F2 /* Debug */,
+				1135218B274C39AF0037C1F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1135218F274C3A320037C1F2 /* ImgProX */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ImgProX;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 11352172274C39AE0037C1F2 /* Project object */;
+}
