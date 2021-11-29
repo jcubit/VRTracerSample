@@ -66,7 +66,7 @@ public func createCube(color: simd_float3, transform: simd_float4x4){
             transform * simd_float4(x: -0.5, y:  0.5, z:  0.5, w: 1),
             transform * simd_float4(x:  0.5, y:  0.5, z:  0.5, w: 1))
     
-    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 6, i3: 2)
+    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 6, i3: 4)
     
     createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 1, i1: 3, i2: 7, i3: 5)
     

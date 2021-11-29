@@ -270,7 +270,7 @@ extension Renderer : MTKViewDelegate {
         intersectionBuffer  = device.makeBuffer(length: MemoryLayout<Intersection>.size * Int(rayCount),
                                                 options: .storageModePrivate)
         
-        // Eventually update projectionMatrix, if we add an aspectRation parameter
+        // Eventually update projectionMatrix, if we add an aspectRatio parameter
         
     }
     
@@ -285,7 +285,7 @@ extension Renderer : MTKViewDelegate {
         self.updateCameraState()
         
         /// Dispatch Test Encoder (Fill Image)
-        self.dispatchComputeShader(computePSO: computePipelineState, with: commandBuffer, setupBlock: {commandEncoder in commandEncoder.setTexture(outputImage, index: 0)})
+        //self.dispatchComputeShader(computePSO: computePipelineState, with: commandBuffer, setupBlock: {commandEncoder in commandEncoder.setTexture(outputImage, index: 0)})
         
         /// Generate rays
         self.dispatchComputeShader(computePSO: rayGenerator, with: commandBuffer, setupBlock: {commandEncoder in commandEncoder.setBuffer(self.rayBuffer, offset: 0, index: 0) })
@@ -323,9 +323,9 @@ extension Renderer : MTKViewDelegate {
         // drawing goes here -----------------------------------------------------------------------------------------------
         
         // TODO: The dynamic buffer should be passed to rayIntersection encoder where the ray directions are defined.
-        blitEncoder.setVertexBuffer(dynamicUniformBuffer,
-                                      offset:uniformBufferOffset,
-                                      index: BufferIndex.uniforms.rawValue)
+//        blitEncoder.setVertexBuffer(dynamicUniformBuffer,
+//                                      offset:uniformBufferOffset,
+//                                      index: BufferIndex.uniforms.rawValue)
         blitEncoder.setRenderPipelineState(blitPipelineState)
         blitEncoder.setFragmentTexture(outputImage, index: 0)
         blitEncoder.drawPrimitives(type: .triangle,

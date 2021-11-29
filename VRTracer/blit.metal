@@ -24,6 +24,37 @@ struct BlitVertexOut
     float2 texelCoordinates;
 };
 
+constant constexpr static const float4 fullscreenTrianglePositions[3]
+{
+    {-1.0, -1.0, 0.0, 1.0},
+    { 3.0, -1.0, 0.0, 1.0},
+    {-1.0,  3.0, 0.0, 1.0}
+    
+//    {-0.5, -0.5, 0.0, 1.0},
+//    { 1.0, -0.5, 0.0, 1.0},
+//    {-0.5,  1.0, 0.0, 1.0}
+};
+
+vertex BlitVertexOut blitVertex(uint vertexIndex [[vertex_id]],
+                                constant Uniforms& uniforms [[ buffer(BufferIndexUniforms)]])
+{
+    BlitVertexOut out;
+    out.position = fullscreenTrianglePositions[vertexIndex];
+
+    // Transforms texture coordinates from NDC [-1,1] space to Normalized Texture Space [0,1]
+    out.texelCoordinates = out.position.xy * 0.5 + 0.5;
+    return out;
+}
+
+fragment float4 blitFragment(BlitVertexOut in [[stage_in]],
+                             texture2d<float> image [[texture(0)]])
+{
+    constexpr sampler linearSampler(coord::normalized, filter::nearest);
+    float4 color = image.sample(linearSampler, in.texelCoordinates);
+    
+    return color;
+}
+
 
 
 //vertex BlitVertexOut blitVertex(const device BlitVertexIn* in [[buffer(0)]],
@@ -120,28 +151,4 @@ struct BlitVertexOut
 ////    { 0.5,  0.5,  0.0, 1}
 //};
 
-constant constexpr static const float4 fullscreenTrianglePositions[3]
-{
-    {-1.0, -1.0, 0.0, 1.0},
-    { 3.0, -1.0, 0.0, 1.0},
-    {-1.0,  3.0, 0.0, 1.0}
-};
 
-vertex BlitVertexOut blitVertex(uint vertexIndex [[vertex_id]],
-                                constant Uniforms& uniforms [[ buffer(BufferIndexUniforms)]])
-{
-    BlitVertexOut out;
-    out.position = fullscreenTrianglePositions[vertexIndex];
-
-    // Transforms from NDC [-1,1] space to Normalized Texture Space [0,1]
-    out.texelCoordinates = out.position.xy * 0.5 + 0.5;
-    return out;
-}
-
-fragment float4 blitFragment(BlitVertexOut in [[stage_in]],
-                             texture2d<float> image [[texture(0)]])
-{
-    constexpr sampler linearSampler(coord::normalized, filter::nearest);
-    float4 color = image.sample(linearSampler, in.texelCoordinates);
-    return color;
-}
