@@ -19,6 +19,7 @@
 		1135219B274CF6DF0037C1F2 /* blit.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1135219A274CF6DF0037C1F2 /* blit.metal */; };
 		1135219D274CF72A0037C1F2 /* rayIntersection.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1135219C274CF72A0037C1F2 /* rayIntersection.metal */; };
 		113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B8F274D0679003A03E6 /* flythrough_camera.c */; };
+		113E8B94274D53AC003A03E6 /* SwiftGeo in Frameworks */ = {isa = PBXBuildFile; productRef = 113E8B93274D53AC003A03E6 /* SwiftGeo */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,9 @@
 		113521BE274D03A20037C1F2 /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		113521BF274D04880037C1F2 /* flythrough_camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flythrough_camera.h; sourceTree = "<group>"; };
 		113E8B8F274D0679003A03E6 /* flythrough_camera.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = flythrough_camera.c; sourceTree = "<group>"; };
+		113E8B91274D4391003A03E6 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
+		113E8B92274D5092003A03E6 /* SwiftGeo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SwiftGeo; path = ../SwiftGeo; sourceTree = "<group>"; };
+		113E8B95274D55B6003A03E6 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				113E8B94274D53AC003A03E6 /* SwiftGeo in Frameworks */,
 				11352190274C3A320037C1F2 /* ImgProX in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,6 +92,8 @@
 				1135219A274CF6DF0037C1F2 /* blit.metal */,
 				1135219C274CF72A0037C1F2 /* rayIntersection.metal */,
 				113521BE274D03A20037C1F2 /* BridgingHeader.h */,
+				113E8B91274D4391003A03E6 /* Utilities.h */,
+				113E8B95274D55B6003A03E6 /* ShaderTypes.h */,
 			);
 			path = VRTracer;
 			sourceTree = "<group>";
@@ -95,6 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				1135218D274C39CB0037C1F2 /* ImgProX */,
+				113E8B92274D5092003A03E6 /* SwiftGeo */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -124,6 +132,7 @@
 			name = VRTracer;
 			packageProductDependencies = (
 				1135218F274C3A320037C1F2 /* ImgProX */,
+				113E8B93274D53AC003A03E6 /* SwiftGeo */,
 			);
 			productName = VRTracer;
 			productReference = 1135217A274C39AE0037C1F2 /* VRTracer.app */;
@@ -405,6 +414,10 @@
 		1135218F274C3A320037C1F2 /* ImgProX */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ImgProX;
+		};
+		113E8B93274D53AC003A03E6 /* SwiftGeo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftGeo;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

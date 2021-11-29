@@ -1,12 +1,3 @@
-//
-//  BridgingHeader.h
-//  VRTracer
-//
-//  Created by Javier Cuesta on 23.11.21.
-//
-
-#ifndef BridgingHeader_h
-#define BridgingHeader_h
-
-
-#endif /* BridgingHeader_h */
+#import "Utilities.h"
+#import "ShaderTypes.h"
+#import "flythrough_camera.h"

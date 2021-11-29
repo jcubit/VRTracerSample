@@ -11,29 +11,9 @@ import ModelIO
 
 
 
-class AppView : MTKView {
-    
-    override var acceptsFirstResponder: Bool {
-        get {
-            return true
-        }
-    }
-    
-    override func becomeFirstResponder() -> Bool {
-        return true
-    }
-    override func keyDown(with event: NSEvent) {
-        print("key pressed")
-    }
-    
-    override func keyUp(with event: NSEvent) {
-        print("key released")
-    }
-}
 
 class ViewController: NSViewController {
 
-//    var mtkView  : AppView!
     var mtkView  : MTKView!
     var renderer : Renderer!
     
@@ -44,13 +24,7 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // set View with storyboard
-//        guard let mtkView = view as? AppView else {
-//            fatalError("metal view not set up in storyboard")
-//        }
-        
-        // Set up View witho Storyboard
-//        mtkView = AppView()
+        // Set up View without Storyboard
         mtkView = MTKView()
         mtkView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(mtkView)
@@ -69,7 +43,9 @@ class ViewController: NSViewController {
         
         mtkView.delegate = renderer
         
-        
+        Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) {timer in
+            self.updateCamera()
+        }
     }
 
     override var representedObject: Any? {
@@ -90,6 +66,60 @@ class ViewController: NSViewController {
     
     override func becomeFirstResponder() -> Bool {
         return true
+    }
+    
+    func updateCamera() {
+        
+        var eye  : [Float] = [0, 0, 8]
+        var look : [Float] = [0, 0, -1]
+        var up   : [Float] = [0, 1, 0]
+        
+        var view = [Float](repeating: 0.0, count: 16)
+        
+        let timeStep : Float = 1.0 / 60.0
+        
+        // speed of translation
+        let eyeSpeed: Float = 6.0
+        // speed of rotation
+        let degreesPerCursorPoint: Float = 1.0
+        let maxPitchRotationDegrees : Float = 89.0
+        
+        let cursorDeltaX = Int32(currentMousePoint.x - previousMousePoint.x)
+        let cursorDeltaY = -Int32(currentMousePoint.y - previousMousePoint.y)
+        
+        let forwardPressed  = keysPressed[kVK_ANSI_W]
+        let backwardPressed = keysPressed[kVK_ANSI_S]
+        let leftPressed  = keysPressed[kVK_ANSI_A]
+        let rightPressed  = keysPressed[kVK_ANSI_D]
+        let jumpPressed : Int32 = 0
+        let crouchPressed : Int32 = 0
+        let flags : UInt32 = 0
+        
+        
+        flythrough_camera_update(&eye,
+                                 &look,
+                                 &up,
+                                 &view,
+                                 timeStep,
+                                 eyeSpeed,
+                                 degreesPerCursorPoint,
+                                 maxPitchRotationDegrees,
+                                 cursorDeltaX,
+                                 cursorDeltaY,
+                                 forwardPressed ? 1 : 0,
+                                 leftPressed ? 1 : 0,
+                                 backwardPressed ? 1 : 0,
+                                 rightPressed ? 1 : 0,
+                                 jumpPressed, crouchPressed, flags)
+        
+        let viewMatrix = matrix_float4x4(columns: (SIMD4<Float>(view[0], view[1], view[2], view[3]),
+                                                   SIMD4<Float>(view[4], view[5], view[6], view[7]),
+                                                   SIMD4<Float>(view[8], view[9], view[10], view[11]),
+                                                   SIMD4<Float>(view[12], view[13], view[14], view[15])))
+        
+        self.renderer.viewMatrix = viewMatrix
+        
+        
     }
     
     // Click down events
