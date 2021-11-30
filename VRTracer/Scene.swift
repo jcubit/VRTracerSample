@@ -16,6 +16,9 @@ var faceColors      = [simd_float3].init()
 
 
 /// Adds a cube face into the vertex buffer, faceVertices
+///
+/// Adapted from MTLRayTracingSample from WWDC20
+///
 /// - Parameters:
 ///   - faceVertices: total vertex buffer
 ///   - faceColors: total color buffer

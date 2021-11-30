@@ -78,8 +78,10 @@ class Renderer : NSObject {
         
         // set Blit render pipeline
         let blitPipelineDescritor                                       = MTLRenderPipelineDescriptor()
-        blitPipelineDescritor.vertexFunction                            = library.makeFunction(name: "blitVertex")
-        blitPipelineDescritor.fragmentFunction                          = library.makeFunction(name: "blitFragment")
+//        blitPipelineDescritor.vertexFunction                            = library.makeFunction(name: "blitVertex")
+//        blitPipelineDescritor.fragmentFunction                          = library.makeFunction(name: "blitFragment")
+        blitPipelineDescritor.vertexFunction                            = library.makeFunction(name: "copyVertex")
+        blitPipelineDescritor.fragmentFunction                          = library.makeFunction(name: "copyFragment")
         blitPipelineDescritor.colorAttachments[0].pixelFormat           = view.colorPixelFormat
         blitPipelineDescritor.depthAttachmentPixelFormat                = view.depthStencilPixelFormat
         
@@ -330,7 +332,7 @@ extension Renderer : MTKViewDelegate {
         blitEncoder.setFragmentTexture(outputImage, index: 0)
         blitEncoder.drawPrimitives(type: .triangle,
                                     vertexStart: 0,
-                                    vertexCount: 3 ) // faceVertices.count / 3
+                                    vertexCount: 6 ) // 6 vertices if we use a quad
         blitEncoder.endEncoding()
         
         guard let drawable = view.currentDrawable else {

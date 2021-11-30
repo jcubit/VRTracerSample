@@ -26,7 +26,8 @@ kernel void generateRays(device Ray* rays [[buffer(0)]],
 {
 //    constant Camera & camera = uniforms.camera;
     
-    const float3 origin = float3(0.0f, 1.0f, 2.1f);
+//    const float3 origin = float3(0.0f, 1.0f, 2.1f);
+    const float3 origin = float3(0.0f, 0.0f, 2.1f);
     
     float aspectRation = float(size.x) / float(size.y);
     
@@ -58,6 +59,9 @@ kernel void handleIntersections(texture2d<float, access::write> image [[texture(
     {
         float w = 1.0 - hit.coordinates.x - hit.coordinates.y;
         image.write(float4(hit.coordinates, w, 1.0), coordinates);
+        // test red cube ------
+//        float4 color(1,0,0,1);
+//        image.write(color, coordinates);
     }
 }
 
