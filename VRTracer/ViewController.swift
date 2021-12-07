@@ -30,16 +30,36 @@ class ViewController: NSViewController {
         view.addSubview(mtkView)
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[mtkView]|", options: [], metrics: nil, views: ["mtkView" : mtkView!]))
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[mtkView]|", options: [], metrics: nil, views: ["mtkView" : mtkView!]))
-
-
-        let device = MTLCreateSystemDefaultDevice()!
-        mtkView.device = device
+        
+        mtkView.bounds.size = view.bounds.size
+        
+        var selectedDevice: MTLDevice!
+        let devices = MTLCopyAllDevices()
+        for device in devices {
+            if(device.supportsRaytracing){
+                selectedDevice = device
+            }
+        }
+        
+//        let device = MTLCreateSystemDefaultDevice()!
+        mtkView.device = selectedDevice!
+        print("Selected device: \(selectedDevice!.name)")
+        
         
         // Specifies the pixel format to use for the buffer that will be rendered to the screen
         // using .rgba32Float cannot be set in the contentViewController. TODO: Investigate why
         mtkView.colorPixelFormat = .rgba16Float
         
-        renderer = Renderer(view: mtkView, device: device)
+        // Create scene
+        let scene = Scene(device: selectedDevice)
+        
+        // Create renderer with a cube scene
+        renderer = Renderer(view: mtkView,
+                            device: selectedDevice,
+                            scene: scene.newInstancedCubeScene(device: selectedDevice, useIntersectionFunctions: true))
+        
+//        print(mtkView.bounds.size)
+//        renderer.mtkView(mtkView, drawableSizeWillChange: mtkView.bounds.size)
         
         mtkView.delegate = renderer
         

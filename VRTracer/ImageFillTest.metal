@@ -8,7 +8,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-
+/// Fills the complete image with interpolated values
 kernel void imageFillTest(texture2d<float, access::write> image [[texture(0)]],
                           uint2 coordinates [[thread_position_in_grid]],
                           uint2 size [[threads_per_grid]])

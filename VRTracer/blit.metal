@@ -36,7 +36,7 @@ constant constexpr static const float4 fullscreenTrianglePositions[3]
 };
 
 vertex BlitVertexOut blitVertex(uint vertexIndex [[vertex_id]],
-                                constant Uniforms& uniforms [[ buffer(BufferIndexUniforms)]])
+                                constant Uniforms& uniforms [[ buffer(2)]])
 {
     BlitVertexOut out;
     out.position = fullscreenTrianglePositions[vertexIndex];

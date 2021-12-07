@@ -20,6 +20,8 @@
 		1135219D274CF72A0037C1F2 /* rayIntersection.metal in Sources */ = {isa = PBXBuildFile; fileRef = 1135219C274CF72A0037C1F2 /* rayIntersection.metal */; };
 		113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B8F274D0679003A03E6 /* flythrough_camera.c */; };
 		113E8B94274D53AC003A03E6 /* SwiftGeo in Frameworks */ = {isa = PBXBuildFile; productRef = 113E8B93274D53AC003A03E6 /* SwiftGeo */; };
+		11CA7F1427567ECF00695FEA /* Transforms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CA7F1327567ECF00695FEA /* Transforms.swift */; };
+		11CA7F1627595C4D00695FEA /* RayTracing.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11CA7F1527595C4D00695FEA /* RayTracing.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +44,9 @@
 		113E8B91274D4391003A03E6 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		113E8B92274D5092003A03E6 /* SwiftGeo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SwiftGeo; path = ../SwiftGeo; sourceTree = "<group>"; };
 		113E8B95274D55B6003A03E6 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
+		11CA7F1327567ECF00695FEA /* Transforms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transforms.swift; sourceTree = "<group>"; };
+		11CA7F1527595C4D00695FEA /* RayTracing.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = RayTracing.metal; sourceTree = "<group>"; };
+		11EEB03D275F97AC002693AC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +65,7 @@
 		11352171274C39AE0037C1F2 = {
 			isa = PBXGroup;
 			children = (
+				11EEB03D275F97AC002693AC /* README.md */,
 				11352191274C44260037C1F2 /* 106 */,
 				1135218C274C39CB0037C1F2 /* Packages */,
 				1135217C274C39AE0037C1F2 /* VRTracer */,
@@ -91,9 +97,11 @@
 				11352198274CF6C00037C1F2 /* ImageFillTest.metal */,
 				1135219A274CF6DF0037C1F2 /* blit.metal */,
 				1135219C274CF72A0037C1F2 /* rayIntersection.metal */,
+				11CA7F1527595C4D00695FEA /* RayTracing.metal */,
 				113521BE274D03A20037C1F2 /* BridgingHeader.h */,
 				113E8B91274D4391003A03E6 /* Utilities.h */,
 				113E8B95274D55B6003A03E6 /* ShaderTypes.h */,
+				11CA7F1327567ECF00695FEA /* Transforms.swift */,
 			);
 			path = VRTracer;
 			sourceTree = "<group>";
@@ -191,8 +199,10 @@
 			files = (
 				113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */,
 				11352197274CF68B0037C1F2 /* Scene.swift in Sources */,
+				11CA7F1427567ECF00695FEA /* Transforms.swift in Sources */,
 				11352180274C39AE0037C1F2 /* ViewController.swift in Sources */,
 				11352195274CF6180037C1F2 /* Renderer.swift in Sources */,
+				11CA7F1627595C4D00695FEA /* RayTracing.metal in Sources */,
 				1135219D274CF72A0037C1F2 /* rayIntersection.metal in Sources */,
 				11352199274CF6C00037C1F2 /* ImageFillTest.metal in Sources */,
 				1135219B274CF6DF0037C1F2 /* blit.metal in Sources */,
