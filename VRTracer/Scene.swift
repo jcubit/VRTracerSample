@@ -127,9 +127,9 @@ public class Scene {
         let scene = Scene(device: device)
         
         // Set up camera
-        scene.cameraPosition  = SIMD3<Float>(0.0, 0.0, -1.0)
-        scene.cameraTarget    = SIMD3<Float>(0.0, 0.0, 0.0)
-        scene.cameraUp        = SIMD3<Float>(0.0, 1.0, 0.0)
+        scene.cameraPosition  = SIMD3<Float>(0.0, 0.0, -1.72) //SIMD3<Float>(0.0, 0.0, -1.0)
+        scene.cameraTarget    = SIMD3<Float>(0.0, 0.0, 0.0) // SIMD3<Float>(0.0, 0.0, 0.0)
+        scene.cameraUp        = SIMD3<Float>(0.0, 1.0, 0.0) // SIMD3<Float>(0.0, 1.0, 0.0)
         
         // Sample Camera
         //        scene.cameraPosition  = SIMD3<Float>(0.0, 1.0, 10.0)
@@ -141,7 +141,7 @@ public class Scene {
         let geometryMesh = Geometry(device: device)
         
         // set geometry mesh of cube
-        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
+        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 1.0, y: 0.0, z: 0.0, w: 1), //SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
                                       transform: transform)
         
         scene.addGeometry(geometry: geometryMesh)
@@ -207,7 +207,8 @@ public class Geometry : NSObject {
         }
         self.vertexColorBuffer = vertexColorBuffer
         
-        print("vertices count: ",vertices.count)
+        print("vertices count: ", vertices.count)
+        print("colors count: ", colors.count)
         
         // For MacOs the storage option is Managed, while in iOS Shared
         let storageOption = MTLResourceOptions.storageModeManaged

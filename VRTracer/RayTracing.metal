@@ -78,7 +78,7 @@ BoundingBoxIntersection boundingboxIntersectionFunction(//Ray parameters passed 
 {
     // TODO: Adapt this to a normal boundingBox
     BoundingBoxIntersection result;
-    
+    result.accept = true;
     return result;
 }
 
@@ -117,11 +117,11 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         
         constant Camera& camera = uniforms.camera;
         
-        // Ray start at the camera position
-        ray.origin = camera.position;
+        // Ray start at the camera position (world space coordinates)
+        ray.origin = camera.position; // (0,0,-1)
         
-        // Map normalized pixel coordinates into camera's coordinate system
-        // i.e. toCamera * (uv,1)
+        // Map normalized pixel coordinates into camera's coordinate system (right-handed)
+        // i.e. toCamera * (u,v,1)
         ray.direction = normalize(uv.x * camera.right +
                                   uv.y * camera.up +
                                   camera.forward);
@@ -135,7 +135,7 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         
         float3 color = float3(1.0f, 1.0f, 1.0f);
         
-        float3 accumulatedColor = float3(0.0f, 0.0f, 0.0f);
+        float3 accumulatedColor = float3(1.0f, 0.0f, 0.0f);
         
         // Create an intersector to test for intersection between the ray and the geometry in the scene.
         intersector<triangle_data, instancing> intersectorTest;
@@ -155,11 +155,23 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         // isn't using intersection functions, it doesn't need to include one.
         if (useIntersectionFunctions) {
             intersection = intersectorTest.intersect(ray, accelerationStructure, intersectionFunctionTable);
+//            intersection = intersectorTest.intersect(ray, accelerationStructure, 0, intersectionFunctionTable);
         } else {
             intersection = intersectorTest.intersect(ray, accelerationStructure);
+//            intersection = intersectorTest.intersect(ray, accelerationStructure, 0);
         }
         
         unsigned int instanceIndex = intersection.instance_id;
+        
+        // Stop if the ray didn't hit anything and has bounced out of the scene.
+        if(intersection.type == intersection_type::none){
+            dstTex.write(float4(accumulatedColor, 1.0f), tid);
+            return;
+        }
+        else {
+            dstTex.write(float4(0.0f,1.0f,0.0f, 1.0f), tid);
+            return;
+        }
         
         // The ray hit something. Look up the transformation matrix for this instance.
         float4x4 objectToWorldSpaceTransform(1.0f);
@@ -193,13 +205,20 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
 //        if (uniforms.frameIndex > 0) {
 //            float3 previousColor = previousTex.read(tid).xyz;
 //            previousColor += uniforms.frameIndex;
-//            
+//
 //            accumulatedColor += previousColor;
 //            accumulatedColor /= (uniforms.frameIndex + 1);
 //        }
         
-//        dstTex.write(float4(accumulatedColor, 1.0f), tid);
         dstTex.write(float4(color, 1.0f), tid);
+//        dstTex.write(float4(accumulatedColor, 1.0f), tid);
+//        if (tid[0] == 10){
+//            dstTex.write(float4(color, 1.0f), tid);
+//        } else {
+//            dstTex.write(float4(0.0f, 0.0f, 0.0f, 1.0f), tid);
+//        }
+
+//        dstTex.write(float4(1.0f,0.0f,0.0f, 1.0f), tid);
         
         
         

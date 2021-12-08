@@ -40,7 +40,7 @@ class Renderer : NSObject {
     var outputImageSize      = MTLSize()
     
     /// Alternative to one destinationImage
-    var accumulationTargets : [MTLTexture]!
+    var accumulationTargets = [MTLTexture]()
     
     /// Functions used in Metal's Intersection stage
     var intersectionFunctionTable   : MTLIntersectionFunctionTable!
@@ -348,10 +348,7 @@ class Renderer : NSObject {
             }
         }
         
-        
         resourceBuffer.didModifyRange(0..<resourceBuffer.length)
-        
-        
     }
     
     /// Create and compact an acceleration structure, given an acceleration structure descriptor.
@@ -370,7 +367,7 @@ class Renderer : NSObject {
         }
         
         // Allocate scratch space used by Metal to build the acceleration structure.
-        // Use MTLResourceStorageModePrivate for best performance since the sample
+        // Use MTLResourceStorageModePrivate for best performance since the App
         // doesn't need access to buffer's contents.
         guard let scratchBuffer = self.device.makeBuffer(length: accelSizes.buildScratchBufferSize,
                                                          options: .storageModePrivate) else {
@@ -517,14 +514,15 @@ class Renderer : NSObject {
             
             // Metal adds the geometry intersection function table offset and instance intersection
             // function table offset together to determine which intersection function to execute.
-            // The sample mapped geometries directly to their intersection functions above, so it
+            // The App mapped geometries directly to their intersection functions above, so it
             // sets the instance's table offset to 0.
             instanceDescriptors[instanceIndex].intersectionFunctionTableOffset = 0;
 
             // Set the instance mask, which the sample uses to filter out intersections between rays
             // and geometry. For example, it uses masks to prevent light sources from being visible
             // to secondary rays, which would result in their contribution being double-counted.
-//            instanceDescriptors[instanceIndex].mask = .zero
+            instanceDescriptors[instanceIndex].mask = UInt32(1) // zero masks the object out
+
 
             // Copy the first three rows of the instance transformation matrix. Metal assumes that
             // the bottom row is (0, 0, 0, 1).
@@ -551,8 +549,6 @@ class Renderer : NSObject {
             fatalError("[createAccelerationStructure] could not create acceleration structure")
         }
         self.instanceAccelerationStructure = instanceAccelerationStructure
-        
-        
     }
     
     
@@ -600,13 +596,16 @@ class Renderer : NSObject {
         uniforms.pointee.camera.right = right
         uniforms.pointee.camera.up = up
         
-        let fieldOfView = Float(45.0) * .pi / Float(180.0)
+        let fieldOfView = Float(45.0) * .pi / Float(180.0) // 45 Degrees
         let aspectRatio = Float(self.outputImageSize.width) / Float(self.outputImageSize.height)
-        let imagePlaneHeight = tanf(fieldOfView / 2.0)
+        let imagePlaneHeight = tanf(fieldOfView / Float(2.0))
         let imagePlaneWidth  = aspectRatio * imagePlaneHeight
         
         uniforms.pointee.camera.right = uniforms.pointee.camera.right * imagePlaneWidth
         uniforms.pointee.camera.up = uniforms.pointee.camera.up * imagePlaneHeight
+        
+        uniforms.pointee.width = UInt32(self.outputImageSize.width)
+        uniforms.pointee.height = UInt32(self.outputImageSize.height)
         
         uniforms.pointee.frameIndex = UInt32(frameIndex)
         frameIndex += 1
@@ -643,11 +642,20 @@ extension Renderer : MTKViewDelegate {
         
         // Stored in private memory because only the GPU will read or write this texture.
         outputImageDescriptor.storageMode = .private
-        
+
         guard let outputImage = device.makeTexture(descriptor: outputImageDescriptor) else {
             fatalError("[Renderer.mtkView] failed to make texture")
         }
         self.outputImage = outputImage
+        
+        // Add accumulatorTargets
+        for _ in 0..<2 {
+            guard let accumulatorTarget = device.makeTexture(descriptor: outputImageDescriptor) else {
+                fatalError("[Renderer.mtkView] failed to make texture")
+            }
+            self.accumulationTargets.append(accumulatorTarget)
+        }
+
         
         self.frameIndex = 0
         
@@ -662,10 +670,28 @@ extension Renderer : MTKViewDelegate {
         
         // TODO: Search for alternative of dispatch_semaphore_wait
         
+        // The App uses the uniform buffer to stream uniform data to the GPU, so it
+        // needs to wait until the GPU finishes processing the oldest GPU frame before
+        // it can reuse that space in the buffer.
+//        dispatchSemaphore.wait(timeout: .distantFuture)
+
+        
         // Create a command for the frame's commands.
         guard let commandBuffer = commandQueue.makeCommandBuffer() else {
             return
         }
+        
+        let sem = dispatchSemaphore!
+        // When the GPU finishes processing command buffer for the frame, signal the
+        // semaphore to make the space in uniform available for future frames.
+
+        // Note: Completion handlers should be as fast as possible as the GPU driver may
+        // have other work scheduled on the underlying dispatch queue.
+        commandBuffer.addCompletedHandler {cb in
+            sem.signal()
+        }
+
+        
         
         // These two methods are replaced by updateUniforms()
 //        self.updateDynamicBufferState()
@@ -748,7 +774,7 @@ extension Renderer : MTKViewDelegate {
             renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
     
             // Create a render command encoder.
-            guard let blitEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!) else {
+            guard let blitEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
                 return
             }
             
@@ -764,6 +790,7 @@ extension Renderer : MTKViewDelegate {
             
             blitEncoder.setRenderPipelineState(blitPipelineState)
             blitEncoder.setFragmentTexture(outputImage, index: 0)
+            
             // Draw a quad which fills the screen.
             blitEncoder.drawPrimitives(type: .triangle,
                                         vertexStart: 0,

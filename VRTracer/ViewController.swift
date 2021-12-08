@@ -26,12 +26,13 @@ class ViewController: NSViewController {
         
         // Set up View without Storyboard
         mtkView = MTKView()
+
         mtkView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(mtkView)
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[mtkView]|", options: [], metrics: nil, views: ["mtkView" : mtkView!]))
         view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[mtkView]|", options: [], metrics: nil, views: ["mtkView" : mtkView!]))
         
-        mtkView.bounds.size = view.bounds.size
+
         
         var selectedDevice: MTLDevice!
         let devices = MTLCopyAllDevices()
