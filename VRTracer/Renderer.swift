@@ -85,7 +85,6 @@ class Renderer : NSObject {
         createBuffers()
         createAccelerationStructures()
         createPipelines()
-
         
         }
     
