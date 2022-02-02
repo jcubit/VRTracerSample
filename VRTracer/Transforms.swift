@@ -2,7 +2,6 @@
 //  Transforms.swift
 //  VRTracer
 //
-//  Created by Javier Cuesta on 30.11.21.
 //
 
 import Foundation

@@ -2,7 +2,6 @@
 //  ViewController.swift
 //  VRTracer
 //
-//  Created by Javier Cuesta on 22.11.21.
 //
 
 import Cocoa

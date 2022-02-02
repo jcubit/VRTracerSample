@@ -2,7 +2,6 @@
 //  ImageFillTest.metal
 //  VRTracer
 //
-//  Created by Javier Cuesta on 23.11.21.
 //
 
 #include <metal_stdlib>

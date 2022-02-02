@@ -2,7 +2,6 @@
 //  ShaderTypes.h
 //  VRTracer
 //
-//  Created by Javier Cuesta on 23.11.21.
 //
 
 #ifndef ShaderTypes_h
@@ -43,17 +42,16 @@ struct Camera {
 
 struct Uniforms
 {
-    // TODO: These are the matrix that we are interested
-//    matrix_float4x4 modelMatrix;
-//      matrix_float4x4 viewMatrix;
-//      matrix_float4x4 projectionMatrix;
-    
     unsigned int width;
     unsigned int height;
     unsigned int frameIndex;
     struct Camera camera;
     
-//    matrix_float4x4 projectionMatrix;
+// TODO: Refactor Uniforms to include these matrices
+//    matrix_float4x4 modelMatrix;
+//      matrix_float4x4 viewMatrix;
+//      matrix_float4x4 projectionMatrix;
+// or
 //    matrix_float4x4 modelViewMatrix;
 } ;
 

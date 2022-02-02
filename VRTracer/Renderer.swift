@@ -2,7 +2,6 @@
 //  Renderer.swift
 //  VRTracer
 //
-//  Created by Javier Cuesta on 23.11.21.
 //
 
 import SwiftGeo
@@ -667,8 +666,7 @@ extension Renderer : MTKViewDelegate {
         
         // TODO: Upate this with new raytracingPipeline with two accumulation targets
         
-        // TODO: Search for alternative of dispatch_semaphore_wait
-        
+        // TODO: Search if there is a modern alternative to dispatch_semaphore_wait
         // The App uses the uniform buffer to stream uniform data to the GPU, so it
         // needs to wait until the GPU finishes processing the oldest GPU frame before
         // it can reuse that space in the buffer.

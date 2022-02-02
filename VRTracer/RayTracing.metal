@@ -2,7 +2,6 @@
 //  RayTracing.metal
 //  VRTracer
 //
-//  Created by Javier Cuesta on 02.12.21.
 //
 
 #include "ShaderTypes.h"
@@ -76,7 +75,7 @@ BoundingBoxIntersection boundingboxIntersectionFunction(//Ray parameters passed 
                                                         // Custom resources bound to the intersection function table.
                                                         device void* resources      [[buffer(0)]])
 {
-    // TODO: Adapt this to a normal boundingBox
+    // TODO: Complete and Adapt Example for a normal boundingBox
     BoundingBoxIntersection result;
     result.accept = true;
     return result;
@@ -211,14 +210,7 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
 //        }
         
         dstTex.write(float4(color, 1.0f), tid);
-//        dstTex.write(float4(accumulatedColor, 1.0f), tid);
-//        if (tid[0] == 10){
-//            dstTex.write(float4(color, 1.0f), tid);
-//        } else {
-//            dstTex.write(float4(0.0f, 0.0f, 0.0f, 1.0f), tid);
-//        }
 
-//        dstTex.write(float4(1.0f,0.0f,0.0f, 1.0f), tid);
         
         
         

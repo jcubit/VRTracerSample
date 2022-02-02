@@ -2,87 +2,10 @@
 //  Scene.swift
 //  VRTracer
 //
-//  Created by Javier Cuesta on 23.11.21.
 //
 
 import simd
 import Metal
-
-///// Vertices of the triangle that forms the cube
-//var allCubeVertices    = [SIMD4<Float>].init()
-///// Vertex Indices of the triangle that forms the cube
-//var allIndices         = [UInt32].init()
-///// The color of each vertex that forms the triangle primitives for the cube
-//var faceColors      = [SIMD3<Float>].init()
-//
-//
-///// Adds a cube face into the vertex buffer, faceVertices
-/////
-///// Adapted from MTLRayTracingSample from WWDC20
-/////
-///// - Parameters:
-/////   - faceVertices: total vertex buffer
-/////   - faceColors: total color buffer
-/////   - color: the color of each vertex in this face
-/////   - cubeVertices: the array of vertices of the cube
-/////   - i0: first vertex index of the face
-/////   - i1: second vertex index of the face
-/////   - i2: third vertex index of the face
-/////   - i3: fourth vertex index of the face
-//public func createCubeFace( faceVertices: inout [SIMD4<Float>],
-//                            faceColors : inout [SIMD3<Float>],
-//                            color:  SIMD3<Float>,
-//                            cubeVertices: [SIMD4<Float>],
-//                            i0 : Int,
-//                            i1 : Int,
-//                            i2 : Int,
-//                            i3 : Int)
-//{
-//    faceVertices.append(cubeVertices[i0])
-//    faceVertices.append(cubeVertices[i1])
-//    faceVertices.append(cubeVertices[i2])
-//    faceVertices.append(cubeVertices[i0])
-//    faceVertices.append(cubeVertices[i2])
-//    faceVertices.append(cubeVertices[i3])
-//
-//    allIndices.append(UInt32(i0))
-//    allIndices.append(UInt32(i1))
-//    allIndices.append(UInt32(i2))
-//    allIndices.append(UInt32(i0))
-//    allIndices.append(UInt32(i2))
-//    allIndices.append(UInt32(i3))
-//
-//    for _ in 0..<6 {
-//        faceColors.append(color)
-//    }
-//}
-//
-//public func createCube(color: SIMD3<Float>, transform: simd_float4x4){
-//
-//    let cubeVertices = [simd_float4].init(
-//        arrayLiteral:
-//            transform * simd_float4(x: -0.5, y: -0.5, z: -0.5, w: 1),
-//            transform * simd_float4(x:  0.5, y: -0.5, z: -0.5, w: 1),
-//            transform * simd_float4(x: -0.5, y:  0.5, z: -0.5, w: 1),
-//            transform * simd_float4(x:  0.5, y:  0.5, z: -0.5, w: 1),
-//            transform * simd_float4(x: -0.5, y: -0.5, z:  0.5, w: 1),
-//            transform * simd_float4(x:  0.5, y: -0.5, z:  0.5, w: 1),
-//            transform * simd_float4(x: -0.5, y:  0.5, z:  0.5, w: 1),
-//            transform * simd_float4(x:  0.5, y:  0.5, z:  0.5, w: 1))
-//
-//    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 6, i3: 4)
-//
-//    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 1, i1: 3, i2: 7, i3: 5)
-//
-//    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 0, i1: 1, i2: 5, i3: 4)
-//
-//    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 2, i1: 6, i2: 7, i3: 3)
-//
-//    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 3, i3: 1)
-//
-//    createCubeFace(faceVertices: &allCubeVertices, faceColors: &faceColors, color: color, cubeVertices: cubeVertices, i0: 4, i1: 5, i2: 7, i3: 6)
-//
-//}
 
 
 public class Scene {
@@ -127,7 +50,7 @@ public class Scene {
         let scene = Scene(device: device)
         
         // Set up camera
-        scene.cameraPosition  = SIMD3<Float>(0.0, 0.0, -1.72) //SIMD3<Float>(0.0, 0.0, -1.0)
+        scene.cameraPosition  = SIMD3<Float>(0.0, 1.5, -2.72) //SIMD3<Float>(0.0, 0.0, -1.72)
         scene.cameraTarget    = SIMD3<Float>(0.0, 0.0, 0.0) // SIMD3<Float>(0.0, 0.0, 0.0)
         scene.cameraUp        = SIMD3<Float>(0.0, 1.0, 0.0) // SIMD3<Float>(0.0, 1.0, 0.0)
         
@@ -195,14 +118,14 @@ public class Geometry : NSObject {
         assert(vertices.count > 0 && colors.count > 0, "vertices or colors arrays have not being loaded")
         
         guard let vertexPositionBuffer = self.device.makeBuffer(length: MemoryLayout<SIMD4<Float>>.stride * vertices.count,
-                                                               options: .storageModeShared) else {
+                                                                options: .storageModeShared) else {
             fatalError("[Geometry.init] device could not make a buffer")
         }
         self.vertexPositionBuffer = vertexPositionBuffer
 
 
         guard let vertexColorBuffer = self.device.makeBuffer(length: MemoryLayout<SIMD4<Float>>.stride * colors.count,
-                                                               options: .storageModeShared) else {
+                                                             options: .storageModeShared) else {
             fatalError("[Geometry.init] device could not make a buffer")
         }
         self.vertexColorBuffer = vertexColorBuffer
