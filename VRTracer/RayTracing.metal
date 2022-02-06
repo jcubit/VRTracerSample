@@ -100,7 +100,7 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
                              instance_acceleration_structure accelerationStructure,
                              intersection_function_table<triangle_data, instancing> intersectionFunctionTable)
 {
-    // The sample aligns the thread count to the threadgroup size. which means the thread count
+    // The App aligns the thread count to the threadgroup size. which means the thread count
     // may be different than the bounds of the texture. Test to make sure this thread
     // is referencing a pixel within the bounds of the texture.
     if(tid.x < uniforms.width && tid.y < uniforms.height) {
@@ -148,7 +148,7 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         
         typename metal::raytracing::intersector<triangle_data, instancing>::result_type intersection;
         
-        intersectorTest.accept_any_intersection(true);
+        intersectorTest.accept_any_intersection(false);
         
         // Check for intersection between the ray and the acceleration structure. If the App
         // isn't using intersection functions, it doesn't need to include one.
@@ -169,8 +169,8 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         }
         else {
             dstTex.write(float4(0.0f,1.0f,0.0f, 1.0f), tid);
-            return;
-        }
+            //return; // we can stop here for a basic intersection test
+        
         
         // The ray hit something. Look up the transformation matrix for this instance.
         float4x4 objectToWorldSpaceTransform(1.0f);
@@ -211,7 +211,7 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         
         dstTex.write(float4(color, 1.0f), tid);
 
-        
+        }
         
         
     }

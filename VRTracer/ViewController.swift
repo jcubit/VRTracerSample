@@ -53,6 +53,8 @@ class ViewController: NSViewController {
         // Create scene
         let scene = Scene(device: selectedDevice)
         
+        
+        
         // Create renderer with a cube scene
         renderer = Renderer(view: mtkView,
                             device: selectedDevice,
@@ -76,6 +78,7 @@ class ViewController: NSViewController {
     
     override func viewDidAppear() {
         self.view.window?.makeFirstResponder(self)
+        self.view.window?.title = "VRTracer"
     }
     
     override var acceptsFirstResponder: Bool {

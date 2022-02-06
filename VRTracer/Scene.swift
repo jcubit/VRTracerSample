@@ -64,8 +64,14 @@ public class Scene {
         let geometryMesh = Geometry(device: device)
         
         // set geometry mesh of cube
-        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 1.0, y: 0.0, z: 0.0, w: 1), //SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
-                                      transform: transform)
+//        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 0.0, y: 0.0, z: 1.0, w: 1), //SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
+//                                      transform: transform)
+//        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
+//                                      transform: transform)
+        geometryMesh.addCubeWithFacesAndColor(color1: SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
+                                              color2: SIMD4<Float>(x: 0.0, y: 1.0, z: 0.0, w: 1),
+                                              color3: SIMD4<Float>(x: 0.0, y: 0.0, z: 1.0, w: 1),
+                                              transform: transform)
         
         scene.addGeometry(geometry: geometryMesh)
         
@@ -201,6 +207,9 @@ public class Geometry : NSObject {
                 transform * SIMD4<Float>(x: -0.5, y:  0.5, z:  0.5, w: 1),
                 transform * SIMD4<Float>(x:  0.5, y:  0.5, z:  0.5, w: 1))
         
+        // Try adding a different color for each side
+        //let colorFaceOne = SIMD4<Float>(x: 0.0, y: 1.0, z: 0.0, w: 1)
+        
         addCubeFaceWithCubeVertices(color: color, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 6, i3: 4)
         
         addCubeFaceWithCubeVertices(color: color, cubeVertices: cubeVertices, i0: 1, i1: 3, i2: 7, i3: 5)
@@ -214,7 +223,37 @@ public class Geometry : NSObject {
         addCubeFaceWithCubeVertices(color: color, cubeVertices: cubeVertices, i0: 4, i1: 5, i2: 7, i3: 6)
     }
     
-    /// Adds a single cube face to the array of vertices
+    /// Adds an entire cube to the scene with three given colors
+    public func addCubeWithFacesAndColor(color1: SIMD4<Float>,
+                                         color2: SIMD4<Float>,
+                                         color3: SIMD4<Float>,
+                                        transform : simd_float4x4)
+    {
+        let cubeVertices = [SIMD4<Float>](
+            arrayLiteral:
+                transform * SIMD4<Float>(x: -0.5, y: -0.5, z: -0.5, w: 1),
+                transform * SIMD4<Float>(x:  0.5, y: -0.5, z: -0.5, w: 1),
+                transform * SIMD4<Float>(x: -0.5, y:  0.5, z: -0.5, w: 1),
+                transform * SIMD4<Float>(x:  0.5, y:  0.5, z: -0.5, w: 1),
+                transform * SIMD4<Float>(x: -0.5, y: -0.5, z:  0.5, w: 1),
+                transform * SIMD4<Float>(x:  0.5, y: -0.5, z:  0.5, w: 1),
+                transform * SIMD4<Float>(x: -0.5, y:  0.5, z:  0.5, w: 1),
+                transform * SIMD4<Float>(x:  0.5, y:  0.5, z:  0.5, w: 1))
+        
+        addCubeFaceWithCubeVertices(color: color1, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 6, i3: 4)
+        
+        addCubeFaceWithCubeVertices(color: color1, cubeVertices: cubeVertices, i0: 1, i1: 3, i2: 7, i3: 5)
+        
+        addCubeFaceWithCubeVertices(color: color2, cubeVertices: cubeVertices, i0: 0, i1: 1, i2: 5, i3: 4)
+        
+        addCubeFaceWithCubeVertices(color: color2, cubeVertices: cubeVertices, i0: 2, i1: 6, i2: 7, i3: 3)
+        
+        addCubeFaceWithCubeVertices(color: color3, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 3, i3: 1)
+        
+        addCubeFaceWithCubeVertices(color: color3, cubeVertices: cubeVertices, i0: 4, i1: 5, i2: 7, i3: 6)
+    }
+    
+    /// Adds a single cube face to the array of vertices and each vertex has the same color
     private func addCubeFaceWithCubeVertices(color:  SIMD4<Float>,
                                              cubeVertices: [SIMD4<Float>],
                                              i0 : Int,
