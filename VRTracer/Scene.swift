@@ -54,11 +54,6 @@ public class Scene {
         scene.cameraTarget    = SIMD3<Float>(0.0, 0.0, 0.0) // SIMD3<Float>(0.0, 0.0, 0.0)
         scene.cameraUp        = SIMD3<Float>(0.0, 1.0, 0.0) // SIMD3<Float>(0.0, 1.0, 0.0)
         
-        // Sample Camera
-        //        scene.cameraPosition  = SIMD3<Float>(0.0, 1.0, 10.0)
-        //        scene.cameraTarget    = SIMD3<Float>(0.0, 1.0, 0.0)
-        //        scene.cameraUp        = SIMD3<Float>(0.0, 1.0, 0.0)
-        
         let transform = matrix_identity_float4x4
         
         let geometryMesh = Geometry(device: device)

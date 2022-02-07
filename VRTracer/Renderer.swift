@@ -66,6 +66,7 @@ class Renderer : NSObject {
     
     var scene               : Scene
     
+    /// Affine transformation to Camera coordinates
     public var viewMatrix : matrix_float4x4 = matrix_identity_float4x4
     var projectionMatrix  : matrix_float4x4 = matrix_identity_float4x4
     
@@ -566,9 +567,7 @@ class Renderer : NSObject {
     private func updateCameraState() {
         // TODO: Either refactor or erase this method. See updateUniforms()
 //        uniforms[0].projectionMatrix = projectionMatrix
-        
-//        let rotationAxis = SIMD3<Float>(1,1,0)
-        
+        //viewMatrix
 //        uniforms[0].modelViewMatrix = viewMatrix
         
     }

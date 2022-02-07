@@ -16,6 +16,8 @@ class ViewController: NSViewController {
     var mtkView  : MTKView!
     var renderer : Renderer!
     
+    var camera = FlyCamera()
+    
     var keysPressed = [Bool](repeating: false, count: Int(UInt16.max))
     var previousMousePoint = NSPoint.zero
     var currentMousePoint = NSPoint.zero
@@ -93,56 +95,27 @@ class ViewController: NSViewController {
     
     func updateCamera() {
         
-        var eye  : [Float] = [0, 0, 8]
-        var look : [Float] = [0, 0, -1]
-        var up   : [Float] = [0, 1, 0]
-        
-        var view = [Float](repeating: 0.0, count: 16)
-        
+
         let timeStep : Float = 1.0 / 60.0
         
-        // speed of translation
-        let eyeSpeed: Float = 6.0
-        // speed of rotation
-        let degreesPerCursorPoint: Float = 1.0
-        let maxPitchRotationDegrees : Float = 89.0
-        
-        let cursorDeltaX = Int32(currentMousePoint.x - previousMousePoint.x)
-        let cursorDeltaY = -Int32(currentMousePoint.y - previousMousePoint.y)
+        let cursorDeltaX = Float(currentMousePoint.x - previousMousePoint.x)
+        let cursorDeltaY = -Float(currentMousePoint.y - previousMousePoint.y) // sign which flips Y-Axis
         
         let forwardPressed  = keysPressed[kVK_ANSI_W]
         let backwardPressed = keysPressed[kVK_ANSI_S]
         let leftPressed  = keysPressed[kVK_ANSI_A]
         let rightPressed  = keysPressed[kVK_ANSI_D]
-        let jumpPressed : Int32 = 0
-        let crouchPressed : Int32 = 0
-        let flags : UInt32 = 0
         
+        self.camera.update(timeStep: timeStep,
+                           cursorDelta: SIMD2<Float>(cursorDeltaX, cursorDeltaY),
+                           forwardPressed: forwardPressed,
+                           leftPressed: leftPressed,
+                           backwardPressed: backwardPressed,
+                           rightPressed: rightPressed)
         
-        flythrough_camera_update(&eye,
-                                 &look,
-                                 &up,
-                                 &view,
-                                 timeStep,
-                                 eyeSpeed,
-                                 degreesPerCursorPoint,
-                                 maxPitchRotationDegrees,
-                                 cursorDeltaX,
-                                 cursorDeltaY,
-                                 forwardPressed ? 1 : 0,
-                                 leftPressed ? 1 : 0,
-                                 backwardPressed ? 1 : 0,
-                                 rightPressed ? 1 : 0,
-                                 jumpPressed, crouchPressed, flags)
-        
-        let viewMatrix = matrix_float4x4(columns: (SIMD4<Float>(view[0], view[1], view[2], view[3]),
-                                                   SIMD4<Float>(view[4], view[5], view[6], view[7]),
-                                                   SIMD4<Float>(view[8], view[9], view[10], view[11]),
-                                                   SIMD4<Float>(view[12], view[13], view[14], view[15])))
-        
-        self.renderer.viewMatrix = viewMatrix
-        
-        
+
+        self.renderer.viewMatrix = self.camera.viewMatrix
+                
     }
     
     // Click down events

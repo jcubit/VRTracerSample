@@ -9,6 +9,12 @@ import simd
 
 
 extension simd_float4x4 {
+    
+    
+    /// initializer of a rotation matrix
+    /// - Parameters:
+    ///   - axis: axis of rotation
+    ///   - angle: angle of rotation in radians
     init(rotationAroundAxis axis: SIMD3<Float>, by angle: Float) {
         let unitAxis = normalize(axis)
         let ct = cosf(angle)
@@ -48,4 +54,29 @@ extension simd_float4x4 {
 
 func radians_from_degrees(_ degrees: Float) -> Float {
     return (degrees / 180) * .pi
+}
+
+
+/// Gives a transformation from world to camera space. This function is particularly useful for placing a camera in the scene.
+/// The camera space is assumed to be right-handed
+/// - Parameters:
+///   - position: the desired position of the camera
+///   - target: the point the camera is looking at
+///   - up: the "up" vector that orients the camera along the viewing direction implied by position and target. This vector is
+///   recomputed to ensure that the final axes are perpendicular. This can be usually set to (0,1,0)
+/// - Returns: world to camera affine transformation
+func makeLookAtCameraTransform(position: SIMD3<Float>, target: SIMD3<Float>, up: SIMD3<Float>) -> simd_float4x4 {
+    var cameraToWorld = matrix_identity_float4x4
+    
+    // define where the camera is looking at
+    let forward = normalize(target - position)
+    let rightSide = normalize(cross(normalize(up), forward))
+    let newUp = normalize(cross(forward, rightSide))
+    
+    cameraToWorld.columns.0 = SIMD4<Float>(rightSide, 0)
+    cameraToWorld.columns.1 = SIMD4<Float>(newUp, 0)
+    cameraToWorld.columns.2 = SIMD4<Float>(-forward, 0)
+    cameraToWorld.columns.3 = SIMD4<Float>(position, 1)
+    
+    return cameraToWorld.inverse
 }
