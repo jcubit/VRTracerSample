@@ -216,3 +216,120 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         
     }
 }
+
+
+// ----------------- rayTracing flycamera ------------------------------
+
+// Main ray tracing kernel
+kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
+                                     constant UniformsFlyCamera& uniformsFlyCamera,
+                                     texture2d<float, access::write> dstTex,
+                                     device void* resources,
+                                     device MTLAccelerationStructureInstanceDescriptor* instances,
+                                     instance_acceleration_structure accelerationStructure,
+                                     intersection_function_table<triangle_data, instancing> intersectionFunctionTable)
+{
+    // The App aligns the thread count to the threadgroup size. which means the thread count
+    // may be different than the bounds of the texture. Test to make sure this thread
+    // is referencing a pixel within the bounds of the texture.
+    if(tid.x < uniformsFlyCamera.width && tid.y < uniformsFlyCamera.height) {
+        // The ray to cast
+        ray ray;
+        
+        constant FlyCamera& camera = uniformsFlyCamera.camera;
+        
+        // Ray start at the camera position (world space coordinates)
+        float4 cameraPosition = camera.cameraToWorld * float4(0,0,0,1);
+        ray.origin = float3(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+        
+        
+        // set ray's direction is in world space coordinates
+        // compute raster (viewport) and camera sample positions
+        float3 pInPixels  = float3(tid.x, tid.y, 1); // as seen in the viewport space
+        float3 pNDC       = camera.viewportToNDC * pInPixels;
+        float4 pCamera    = camera.NDCToCamera * float4(pNDC.x, pNDC.y, pNDC.z,1);
+        pCamera *= pCamera.w;
+        
+        ray.direction = normalize(float3(pCamera.x, pCamera.y, pCamera.z));
+
+
+        // Don't limit intersection distance.
+        ray.max_distance = INFINITY;
+        
+        // Start with a fully white color. The kernel scales the light each time the
+        // ray bounces off of a surface, based on how much of each light component
+        // the surface absorbs.
+        
+        float3 color = float3(1.0f, 1.0f, 1.0f);
+        
+        float3 accumulatedColor = float3(1.0f, 0.0f, 0.0f);
+        
+        // Create an intersector to test for intersection between the ray and the geometry in the scene.
+        intersector<triangle_data, instancing> intersectorTest;
+        
+        // If the sample isn't using intersection functions, provide some hints to Metal for
+        // better performance
+        if (!useIntersectionFunctions) {
+            intersectorTest.assume_geometry_type(geometry_type::triangle);
+            intersectorTest.force_opacity(forced_opacity::opaque);
+        }
+        
+        typename metal::raytracing::intersector<triangle_data, instancing>::result_type intersection;
+        
+        intersectorTest.accept_any_intersection(false);
+        
+        // Check for intersection between the ray and the acceleration structure. If the App
+        // isn't using intersection functions, it doesn't need to include one.
+        if (useIntersectionFunctions) {
+            intersection = intersectorTest.intersect(ray, accelerationStructure, intersectionFunctionTable);
+//            intersection = intersectorTest.intersect(ray, accelerationStructure, 0, intersectionFunctionTable);
+        } else {
+            intersection = intersectorTest.intersect(ray, accelerationStructure);
+//            intersection = intersectorTest.intersect(ray, accelerationStructure, 0);
+        }
+        
+        unsigned int instanceIndex = intersection.instance_id;
+        
+        // Stop if the ray didn't hit anything and has bounced out of the scene.
+        if(intersection.type == intersection_type::none){
+            dstTex.write(float4(accumulatedColor, 1.0f), tid);
+            return;
+        }
+        else {
+            dstTex.write(float4(0.0f,1.0f,0.0f, 1.0f), tid);
+            //return; // we can stop here for a basic intersection test
+        
+        
+        // The ray hit something. Look up the transformation matrix for this instance.
+        float4x4 objectToWorldSpaceTransform(1.0f);
+        
+        for (int column = 0; column < 4; ++column){
+            for (int row = 0; row < 3; ++row) {
+                objectToWorldSpaceTransform[column][row] = instances[instanceIndex].transformationMatrix[column][row];
+            }
+        }
+        
+        unsigned primitiveIndex = intersection.primitive_id;
+        unsigned int geometryIndex = instances[instanceIndex].accelerationStructureIndex;
+        float2 barycentric_coords = intersection.triangle_barycentric_coord;
+        
+        float3 surfaceColor = 0.0f;
+        
+        // The ray hit a triangle. Look up the corresponding geometry's normal and UV buffers.
+        device TriangleResources& triangleResources = *(device TriangleResources *) ((device char *)resources + resourcesStride * geometryIndex);
+        
+        // Interpolate the vertex color at the intersection point.
+        surfaceColor = interpolateVertexAttribute(triangleResources.vertexColors, primitiveIndex, barycentric_coords);
+        
+        // Scale the ray color by the color of the surface. This simulates light being absorbed into
+        // the surface.
+        color *= surfaceColor;
+        
+        dstTex.write(float4(color, 1.0f), tid);
+
+        }
+        
+        
+    }
+}
+

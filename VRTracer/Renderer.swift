@@ -63,6 +63,8 @@ class Renderer : NSObject {
     var frameIndex = 0
     /// Triple buffer of Uniforms
     var uniforms : UnsafeMutablePointer<Uniforms>!
+    /// Triple buffer of Uniforms holding FlyCamera
+    var uniformsFlycamera : UnsafeMutablePointer<UniformsFlyCamera>!
     
     var scene               : Scene
     
@@ -612,6 +614,52 @@ class Renderer : NSObject {
         uniformBufferIndex = (uniformBufferIndex + 1) % maxBuffersInFlight
     }
     
+    /// updates flythrough camera parameters and the triple dynamic buffer
+    private func updateUniformsWithFlyCamera(){
+        // TODO: include the general perspective matrix and viewport information
+        self.uniformBufferOffset = alignedUniformsSize * uniformBufferIndex
+        
+        uniformsFlycamera = UnsafeMutableRawPointer(dynamicUniformBuffer.contents() + uniformBufferOffset).bindMemory(to: UniformsFlyCamera.self,
+                                                                                                             capacity: 1)
+        
+        let position = self.scene.cameraPosition
+        let target   = self.scene.cameraTarget
+        let up       = self.scene.cameraUp
+        
+        let viewMatrix = makeLookAtCameraTransform(position: position, target: target, up: up)
+        
+        uniformsFlycamera.pointee.camera.worldToCamera = viewMatrix
+        uniformsFlycamera.pointee.camera.cameraToWorld = viewMatrix.inverse
+        
+        let zNear = 0.0
+        let zFar = 1.0 // image plane is located at zFar
+        let fieldOfView = Float(45.0) * .pi / Float(180.0) // 45 Degrees
+        let aspectRatio = Float(self.outputImageSize.width) / Float(self.outputImageSize.height)
+        let imagePlaneHeight = tanf(fieldOfView / Float(2.0 * zFar))
+        let imagePlaneWidth  = aspectRatio * imagePlaneHeight
+        
+        let scaleToImagePlane = simd_float4x4(scaleBy: SIMD3<Float>(imagePlaneWidth, imagePlaneHeight, 1))
+        let inversePerspective = matrix_identity_float4x4 // TODO: replace this for general perspectiveMatrix
+        
+        uniformsFlycamera.pointee.camera.NDCToCamera = inversePerspective * scaleToImagePlane
+        
+        let viewportToNDC = simd_float3x3(columns: (simd_float3(2.0 / Float(self.outputImageSize.width), 0, 0),
+                                                    simd_float3(0, -2.0 / Float(self.outputImageSize.height), 0),
+                                                    simd_float3(-1.0,   1.0,    1)))
+        
+        uniformsFlycamera.pointee.camera.viewportToNDC = viewportToNDC
+        
+        uniforms.pointee.width = UInt32(self.outputImageSize.width)
+        uniforms.pointee.height = UInt32(self.outputImageSize.height)
+        
+        uniforms.pointee.frameIndex = UInt32(frameIndex)
+        frameIndex += 1
+        
+        dynamicUniformBuffer.didModifyRange(uniformBufferOffset..<(uniformBufferOffset + alignedUniformsSize))
+        
+        uniformBufferIndex = (uniformBufferIndex + 1) % maxBuffersInFlight
+    }
+    
     
 }
 
@@ -782,6 +830,11 @@ extension Renderer : MTKViewDelegate {
 //
 //            print("view of size (\(width), \(height)) with aspect ratio \(aspectRatio)")
             
+            // TODO: play with the viewport
+//            let zNear = 1e-2
+//            let zFar = 1000
+//            let viewport = MTLViewport(originX: 0.0, originY: 0.0, width: outputImageSize.width, height: outputImageSize.height, znear: zNear, zfar: zFar)
+            //blitEncoder.setViewport(<#T##viewport: MTLViewport##MTLViewport#>)
             // drawing goes here -----------------------------------------------------------------------------------------------
             
             blitEncoder.setRenderPipelineState(blitPipelineState)

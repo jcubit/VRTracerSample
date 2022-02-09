@@ -53,7 +53,30 @@ struct Uniforms
 //      matrix_float4x4 projectionMatrix;
 // or
 //    matrix_float4x4 modelViewMatrix;
-} ;
+};
+
+
+struct FlyCamera {
+    simd_float4x4 worldToCamera;
+    simd_float4x4 cameraToWorld;
+    simd_float3x3 viewportToNDC;
+    simd_float4x4 NDCToCamera;
+};
+
+struct UniformsFlyCamera
+{
+    unsigned int width;
+    unsigned int height;
+    unsigned int frameIndex;
+    struct FlyCamera camera;
+    
+// TODO: Refactor Uniforms to include these matrices
+//    matrix_float4x4 modelMatrix;
+//      matrix_float4x4 viewMatrix;
+//      matrix_float4x4 projectionMatrix;
+// or
+//    matrix_float4x4 modelViewMatrix;
+};
 
 
 
