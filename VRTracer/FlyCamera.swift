@@ -9,8 +9,10 @@ import simd
 
 public final class FlyCamera {
     
+    /// position of the camera in world coordinates
     private var eye  = SIMD3<Float>(0.0, 1.5, -2.72)
-    private var look = SIMD3<Float>(0.0, 0.0, 0.0)
+    /// where the camera is looking at, i.e. look = target - eye
+    private var look = SIMD3<Float>(0.0, 0.0, 1.0)
     private var up   = SIMD3<Float>(0.0, 1.0, 0)
     
     // speed of camera translation
@@ -22,7 +24,7 @@ public final class FlyCamera {
     // viewMatrix which is the in-out parameter of flythrough_camera_upate
     var viewMatrix : simd_float4x4 {
         get {
-            return makeLookAtCameraTransform(position: eye, target: eye + look, up: up)
+            return makeLookAtCameraTransform(position: eye, target: look + eye, up: up)
         }
     }
     

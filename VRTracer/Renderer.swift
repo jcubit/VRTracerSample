@@ -14,6 +14,7 @@ import simd
 // The 256 byte aligned size of our uniform structure. In other words,
 // the chosen stride of the Uniforms. Use 16 bytes on iOS.
 let alignedUniformsSize = (MemoryLayout<Uniforms>.size + 0xFF) & -0x100
+let alignedUniformsFlyCameraSize = (MemoryLayout<UniformsFlyCamera>.size + 0xFF) & -0x100
 // Triple Buffering to avoid stalling
 let maxBuffersInFlight = 3
 
@@ -54,11 +55,16 @@ class Renderer : NSObject {
     /// Semaphore
     var dispatchSemaphore       : DispatchSemaphore!
     
-    var dynamicUniformBuffer   : MTLBuffer!
+    /// Dynamic uniform Buffer for static camera
+    var dynamicUniformBuffer            : MTLBuffer!
+    /// Dynamic uniform Buffer for fly camera
+    var dynamicUniformBufferFlyCamera   : MTLBuffer!
     ///index to keep track of the current buffer in use
     var uniformBufferIndex = 0
     /// Current offset of the triple buffer
     var uniformBufferOffset = 0
+    /// Current offset of the triple buffer for fly camera
+    var uniformBufferOffsetFlyCamera = 0
     /// Frame Index
     var frameIndex = 0
     /// Triple buffer of Uniforms
@@ -84,7 +90,8 @@ class Renderer : NSObject {
         super.init()
         
         loadMetal()
-        createBuffers()
+//        createBuffers()
+        createBuffersFlyCamera()
         createAccelerationStructures()
         createPipelines()
         
@@ -205,9 +212,12 @@ class Renderer : NSObject {
         
         
         // Main RT Function
-        guard let raytracingFunction = self.specializedFunction(withName: "raytracingKernel") else {
+        guard let raytracingFunction = self.specializedFunction(withName: "raytracingKernelFlyCamera") else {
             fatalError("failed to load the main raytracing kernel")
         }
+//        guard let raytracingFunction = self.specializedFunction(withName: "raytracingKernel") else {
+//            fatalError("failed to load the main raytracing kernel")
+//        }
         
         self.rayTracingPipeline = newComputePipelineState(function: raytracingFunction,
                                                      linkedFunctions: Array<MTLFunction>(intersectionFunctions.values))
@@ -302,6 +312,70 @@ class Renderer : NSObject {
         self.dynamicUniformBuffer = self.device.makeBuffer(length: uniformBufferSize,
                                                            options: [storageOption])!
         self.dynamicUniformBuffer.label = "UniformBuffer"
+        
+        // Upload scene data to buffers.
+        self.scene.uploadToBuffers()
+        
+        self.resourcesStride = 0
+        
+        // Each intersection function has its own set of resources. Determine the maximum size over all
+        // intersection functions. This will become the stride used by intersection functions to find
+        // the starting address for their resources.
+        for geometry in scene.geometries {
+            guard let encoder = newArgumentEncoderForResources(resources: geometry.resources()) else {
+                fatalError("[Renderer.createBuffers] newArgumentEncoderForResources returned nil")
+            }
+            
+            if encoder.encodedLength > self.resourcesStride {
+                self.resourcesStride = UInt32(encoder.encodedLength)
+            }
+                
+        }
+        
+        // Create the resource buffer.
+        self.resourceBuffer = device.makeBuffer(length: Int(resourcesStride) * scene.geometries.count,
+                                                options: storageOption)
+        
+        for (geometryIndex, geometry) in scene.geometries.enumerated() {
+            
+            // Create an argument encoder for this geometry's intersection function's resources
+            guard let encoder = newArgumentEncoderForResources(resources: geometry.resources()) else {
+                fatalError("[createBuffers] could not create newArgumentEncoderForResources")
+            }
+            
+            // Bind the argument encoder to the resource buffer at this geometry's offset.
+            encoder.setArgumentBuffer(self.resourceBuffer,
+                                      offset: Int(self.resourcesStride) * geometryIndex)
+
+            // Encode the arguments into the resource buffer.
+            for (argumentIndex, resource) in geometry.resources().enumerated() {
+                if(resource.conforms(to: MTLBuffer.self)){
+                    encoder.setBuffer(resource as? MTLBuffer,
+                                      offset: 0,
+                                      index: argumentIndex)
+                } else if resource.conforms(to: MTLTexture.self) {
+                    encoder.setTexture(resource as? MTLTexture, index: argumentIndex)
+                }
+            }
+        }
+        
+        resourceBuffer.didModifyRange(0..<resourceBuffer.length)
+    }
+    
+    /// Initializes the dynamic uniforms buffer
+    private func createBuffersFlyCamera() {
+        // The uniform buffer contains a few small values which change from frame to frame. The
+        // sample can have up to 3 frames in flight at once, so allocate a range of the buffer
+        // for each frame. The GPU reads from one chunk while the CPU writes to the next chunk.
+        // Align the chunks to 256 bytes on macOS and 16 bytes on iOS.
+        let uniformBufferSize = alignedUniformsFlyCameraSize * maxBuffersInFlight
+        
+        // For MacOs the storage option is Managed, while in iOS Shared
+        let storageOption = MTLResourceOptions.storageModeManaged
+        
+        self.dynamicUniformBufferFlyCamera = self.device.makeBuffer(length: uniformBufferSize,
+                                                           options: [storageOption])!
+        self.dynamicUniformBufferFlyCamera.label = "UniformFlyCameraBuffer"
         
         // Upload scene data to buffers.
         self.scene.uploadToBuffers()
@@ -617,21 +691,24 @@ class Renderer : NSObject {
     /// updates flythrough camera parameters and the triple dynamic buffer
     private func updateUniformsWithFlyCamera(){
         // TODO: include the general perspective matrix and viewport information
-        self.uniformBufferOffset = alignedUniformsSize * uniformBufferIndex
+        self.uniformBufferOffsetFlyCamera = alignedUniformsFlyCameraSize * uniformBufferIndex
         
-        uniformsFlycamera = UnsafeMutableRawPointer(dynamicUniformBuffer.contents() + uniformBufferOffset).bindMemory(to: UniformsFlyCamera.self,
+        uniformsFlycamera = UnsafeMutableRawPointer(dynamicUniformBufferFlyCamera.contents() + uniformBufferOffsetFlyCamera).bindMemory(to: UniformsFlyCamera.self,
                                                                                                              capacity: 1)
         
-        let position = self.scene.cameraPosition
-        let target   = self.scene.cameraTarget
+        var position = self.scene.cameraPosition
+        var target   = self.scene.cameraTarget
         let up       = self.scene.cameraUp
         
+//        position.y = 0 // test
+        
         let viewMatrix = makeLookAtCameraTransform(position: position, target: target, up: up)
+        let cameraToWorld = viewMatrix.inverse
         
         uniformsFlycamera.pointee.camera.worldToCamera = viewMatrix
-        uniformsFlycamera.pointee.camera.cameraToWorld = viewMatrix.inverse
+        uniformsFlycamera.pointee.camera.cameraToWorld = cameraToWorld
         
-        let zNear = 0.0
+        let zNear = 0.0 
         let zFar = 1.0 // image plane is located at zFar
         let fieldOfView = Float(45.0) * .pi / Float(180.0) // 45 Degrees
         let aspectRatio = Float(self.outputImageSize.width) / Float(self.outputImageSize.height)
@@ -639,23 +716,27 @@ class Renderer : NSObject {
         let imagePlaneWidth  = aspectRatio * imagePlaneHeight
         
         let scaleToImagePlane = simd_float4x4(scaleBy: SIMD3<Float>(imagePlaneWidth, imagePlaneHeight, 1))
-        let inversePerspective = matrix_identity_float4x4 // TODO: replace this for general perspectiveMatrix
+        var inversePerspective = matrix_identity_float4x4 // TODO: replace this for general perspectiveMatrix
+//        inversePerspective[2][2] = 1.0 // change to left hand coordinate system
+//        inversePerspective[3][2] = 1.0 // change to left hand coordinate system
         
         uniformsFlycamera.pointee.camera.NDCToCamera = inversePerspective * scaleToImagePlane
         
-        let viewportToNDC = simd_float3x3(columns: (simd_float3(2.0 / Float(self.outputImageSize.width), 0, 0),
-                                                    simd_float3(0, -2.0 / Float(self.outputImageSize.height), 0),
-                                                    simd_float3(-1.0,   1.0,    1)))
+        // Inverse of viewport transformation in homogeneous coordinates
+        let viewportToNDC = simd_float4x4(columns: (simd_float4(2.0 / Float(self.outputImageSize.width), 0.0, 0.0, 0.0),
+                                                    simd_float4(0, -2.0 / Float(self.outputImageSize.height), 0.0, 0.0),
+                                                    simd_float4(0, 0, -1, 0.0),
+                                                    simd_float4(-1.0,   1.0,  0.0,  1.0)))
         
         uniformsFlycamera.pointee.camera.viewportToNDC = viewportToNDC
         
-        uniforms.pointee.width = UInt32(self.outputImageSize.width)
-        uniforms.pointee.height = UInt32(self.outputImageSize.height)
+        uniformsFlycamera.pointee.width = UInt32(self.outputImageSize.width)
+        uniformsFlycamera.pointee.height = UInt32(self.outputImageSize.height)
         
-        uniforms.pointee.frameIndex = UInt32(frameIndex)
+        uniformsFlycamera.pointee.frameIndex = UInt32(frameIndex)
         frameIndex += 1
         
-        dynamicUniformBuffer.didModifyRange(uniformBufferOffset..<(uniformBufferOffset + alignedUniformsSize))
+        dynamicUniformBufferFlyCamera.didModifyRange(uniformBufferOffsetFlyCamera..<(uniformBufferOffsetFlyCamera + alignedUniformsFlyCameraSize))
         
         uniformBufferIndex = (uniformBufferIndex + 1) % maxBuffersInFlight
     }
@@ -741,8 +822,8 @@ extension Renderer : MTKViewDelegate {
 //        self.updateDynamicBufferState()
 //        self.updateCameraState()
         
-        self.updateUniforms()
-        
+//        self.updateUniforms()
+        self.updateUniformsWithFlyCamera()
         
         // Launch a rectangular grid of threads on the GPU to perform ray tracing, with one thread per
         // pixel. The App needs to align the number of threads to a multiple of the threadgroup
@@ -762,7 +843,8 @@ extension Renderer : MTKViewDelegate {
         }
         
         // Bind buffers
-        computeEncoder.setBuffer(self.dynamicUniformBuffer, offset: self.uniformBufferOffset, index: 0)
+        computeEncoder.setBuffer(self.dynamicUniformBufferFlyCamera, offset: self.uniformBufferOffsetFlyCamera, index: 0)
+//        computeEncoder.setBuffer(self.dynamicUniformBuffer, offset: self.uniformBufferOffset, index: 0)
         computeEncoder.setBuffer(self.resourceBuffer, offset: 0, index: 1)
         computeEncoder.setBuffer(self.instanceBuffer, offset: 0, index: 2)
         

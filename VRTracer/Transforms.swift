@@ -58,20 +58,21 @@ func radians_from_degrees(_ degrees: Float) -> Float {
 
 
 /// Gives a transformation from world to camera space. This function is particularly useful for placing a camera in the scene.
-/// The camera space is assumed to be right-handed
+/// The camera space is assumed to be right-handed. The latter means that the camera is pointing in the -z direction w.r.t his
+/// own coordinate system
 /// - Parameters:
-///   - position: the desired position of the camera
-///   - target: the point the camera is looking at
+///   - position: the desired position of the camera in world coordinates
+///   - target: the point the camera is looking at in world coordinates
 ///   - up: the "up" vector that orients the camera along the viewing direction implied by position and target. This vector is
-///   recomputed to ensure that the final axes are perpendicular. This can be usually set to (0,1,0)
+///   recomputed to ensure that the final axes are perpendicular. This can be usually set to (0,1,0) and is given in world coordinates
 /// - Returns: world to camera affine transformation
 func makeLookAtCameraTransform(position: SIMD3<Float>, target: SIMD3<Float>, up: SIMD3<Float>) -> simd_float4x4 {
     var cameraToWorld = matrix_identity_float4x4
     
     // define where the camera is looking at
     let forward = normalize(target - position)
-    let rightSide = normalize(cross(normalize(up), forward))
-    let newUp = normalize(cross(forward, rightSide))
+    let rightSide = normalize(cross(forward, normalize(up)))
+    let newUp = normalize(cross(rightSide, forward))
     
     cameraToWorld.columns.0 = SIMD4<Float>(rightSide, 0)
     cameraToWorld.columns.1 = SIMD4<Float>(newUp, 0)

@@ -120,7 +120,7 @@ kernel void raytracingKernel(uint2 tid [[thread_position_in_grid]],
         ray.origin = camera.position; // (0,0,-1)
         
         // Map normalized pixel coordinates into camera's coordinate system (right-handed)
-        // i.e. toCamera * (u,v,1)
+        // i.e. toWorld * NDCtoCamera * (u,v,1)
         ray.direction = normalize(uv.x * camera.right +
                                   uv.y * camera.up +
                                   camera.forward);
@@ -243,14 +243,19 @@ kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
         ray.origin = float3(cameraPosition.x, cameraPosition.y, cameraPosition.z);
         
         
-        // set ray's direction is in world space coordinates
-        // compute raster (viewport) and camera sample positions
-        float3 pInPixels  = float3(tid.x, tid.y, 1); // as seen in the viewport space
-        float3 pNDC       = camera.viewportToNDC * pInPixels;
-        float4 pCamera    = camera.NDCToCamera * float4(pNDC.x, pNDC.y, pNDC.z,1);
-        pCamera *= pCamera.w;
+        // set ray's direction in world space coordinates
+        float4 pInPixels  = float4(tid.x, tid.y, 1, 1); // as seen in the viewport space in homogeneous coordinates
+        float4 pNDC       = camera.viewportToNDC * pInPixels;
+        float4 pCamera    = camera.NDCToCamera * pNDC;
         
-        ray.direction = normalize(float3(pCamera.x, pCamera.y, pCamera.z));
+//        float4 pWorld       = camera.cameraToWorld * pCamera;
+//        float4 rayDirection = pWorld - cameraPosition;
+//        ray.direction = normalize(float3(rayDirection.x, rayDirection.y, rayDirection.z));
+        // we could have alternative compute the vector in camera space and transformed into world coordinates by
+        // the affine trafo cameraToWorld
+        float4 dirInCameraSpace = float4(pCamera.x, pCamera.y, pCamera.z, 0);
+        float4 rayDirection = camera.cameraToWorld * dirInCameraSpace;
+        ray.direction = normalize(float3(rayDirection.x, rayDirection.y, rayDirection.z));
 
 
         // Don't limit intersection distance.
@@ -259,9 +264,9 @@ kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
         // Start with a fully white color. The kernel scales the light each time the
         // ray bounces off of a surface, based on how much of each light component
         // the surface absorbs.
-        
         float3 color = float3(1.0f, 1.0f, 1.0f);
         
+        // We use it here as the background color
         float3 accumulatedColor = float3(1.0f, 0.0f, 0.0f);
         
         // Create an intersector to test for intersection between the ray and the geometry in the scene.
