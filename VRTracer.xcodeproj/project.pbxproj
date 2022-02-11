@@ -21,6 +21,7 @@
 		113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */ = {isa = PBXBuildFile; fileRef = 113E8B8F274D0679003A03E6 /* flythrough_camera.c */; };
 		113E8B94274D53AC003A03E6 /* SwiftGeo in Frameworks */ = {isa = PBXBuildFile; productRef = 113E8B93274D53AC003A03E6 /* SwiftGeo */; };
 		116A6E2C27B1815E00C5F5C9 /* FlyCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116A6E2B27B1815E00C5F5C9 /* FlyCamera.swift */; };
+		11A9A1A427B6BCA8008F49E6 /* Cameras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11A9A1A327B6BCA8008F49E6 /* Cameras.swift */; };
 		11CA7F1427567ECF00695FEA /* Transforms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CA7F1327567ECF00695FEA /* Transforms.swift */; };
 		11CA7F1627595C4D00695FEA /* RayTracing.metal in Sources */ = {isa = PBXBuildFile; fileRef = 11CA7F1527595C4D00695FEA /* RayTracing.metal */; };
 /* End PBXBuildFile section */
@@ -46,6 +47,7 @@
 		113E8B92274D5092003A03E6 /* SwiftGeo */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SwiftGeo; path = ../SwiftGeo; sourceTree = "<group>"; };
 		113E8B95274D55B6003A03E6 /* ShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderTypes.h; sourceTree = "<group>"; };
 		116A6E2B27B1815E00C5F5C9 /* FlyCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyCamera.swift; sourceTree = "<group>"; };
+		11A9A1A327B6BCA8008F49E6 /* Cameras.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cameras.swift; sourceTree = "<group>"; };
 		11CA7F1327567ECF00695FEA /* Transforms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transforms.swift; sourceTree = "<group>"; };
 		11CA7F1527595C4D00695FEA /* RayTracing.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = RayTracing.metal; sourceTree = "<group>"; };
 		11EEB03D275F97AC002693AC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 				113E8B95274D55B6003A03E6 /* ShaderTypes.h */,
 				11CA7F1327567ECF00695FEA /* Transforms.swift */,
 				116A6E2B27B1815E00C5F5C9 /* FlyCamera.swift */,
+				11A9A1A327B6BCA8008F49E6 /* Cameras.swift */,
 			);
 			path = VRTracer;
 			sourceTree = "<group>";
@@ -200,6 +203,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11A9A1A427B6BCA8008F49E6 /* Cameras.swift in Sources */,
 				113E8B90274D0679003A03E6 /* flythrough_camera.c in Sources */,
 				11352197274CF68B0037C1F2 /* Scene.swift in Sources */,
 				11CA7F1427567ECF00695FEA /* Transforms.swift in Sources */,

@@ -4,8 +4,6 @@
 //
 //
 
-import SwiftGeo
-
 import Foundation
 import MetalKit
 import simd
@@ -74,16 +72,16 @@ class Renderer : NSObject {
     
     var scene               : Scene
     
-    /// Affine transformation to Camera coordinates
-    public var viewMatrix : matrix_float4x4 = matrix_identity_float4x4
-    var projectionMatrix  : matrix_float4x4 = matrix_identity_float4x4
+    /// Affine transformation from World to Camera coordinates
+    public var camera : RTCamera
     
-    var rotationValue : Float = 0.0
     
-    init(view: MTKView, device: MTLDevice, scene: Scene){
+    init(view: MTKView, device: MTLDevice, scene: Scene, camera: RTCamera){
 
         self.device = device
         self.scene = scene
+//        self.perspectiveCamera = PerspectiveCamera(cameraToWorld: matrix_identity_float4x4, windowSize: SIMD2<Float>(0,0))
+        self.camera = camera
         
         self.dispatchSemaphore = DispatchSemaphore(value: frameIndex)
         
@@ -94,7 +92,7 @@ class Renderer : NSObject {
         createBuffersFlyCamera()
         createAccelerationStructures()
         createPipelines()
-        
+
         }
     
     /// Loads the CommandQueue and the Metal's library
@@ -110,6 +108,7 @@ class Renderer : NSObject {
         self.library = library
         
     }
+    
     
     
     /// Create a compute pipeline state with an optional array of additional functions to link the compute
@@ -627,30 +626,16 @@ class Renderer : NSObject {
     }
     
     
-    /// Updates the state of our uniform buffers before rendering
-    private func updateDynamicBufferState() {
-        // TODO: Either refactor or erase this method. See updateUniforms()
-        uniformBufferIndex = (uniformBufferIndex + 1) % maxBuffersInFlight
-        
-        uniformBufferOffset = alignedUniformsSize * uniformBufferIndex
-        
-//        uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents() + uniformBufferOffset).bindMemory(to: Uniforms.self,
-//                                                                                                             capacity: 1)
-    }
-    
     
     /// updates camera parameters before rendering.
-    private func updateCameraState() {
-        // TODO: Either refactor or erase this method. See updateUniforms()
-//        uniforms[0].projectionMatrix = projectionMatrix
-        //viewMatrix
-//        uniforms[0].modelViewMatrix = viewMatrix
-        
+    private func updateCameraState(windowSize: SIMD2<Float>) {
+        if let perspectiveCamera = camera as? PerspectiveCamera {
+            perspectiveCamera.windowSize = windowSize
+        }
     }
     
     /// updates camera parameters and the triple dynamic buffer
     private func updateUniforms(){
-        // TODO: refactor this method to use transformation matrices instead of camera struct
         self.uniformBufferOffset = alignedUniformsSize * uniformBufferIndex
         
         uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents() + uniformBufferOffset).bindMemory(to: Uniforms.self,
@@ -690,45 +675,13 @@ class Renderer : NSObject {
     
     /// updates flythrough camera parameters and the triple dynamic buffer
     private func updateUniformsWithFlyCamera(){
-        // TODO: include the general perspective matrix and viewport information
         self.uniformBufferOffsetFlyCamera = alignedUniformsFlyCameraSize * uniformBufferIndex
         
         uniformsFlycamera = UnsafeMutableRawPointer(dynamicUniformBufferFlyCamera.contents() + uniformBufferOffsetFlyCamera).bindMemory(to: UniformsFlyCamera.self,
-                                                                                                             capacity: 1)
-        
-        var position = self.scene.cameraPosition
-        var target   = self.scene.cameraTarget
-        let up       = self.scene.cameraUp
-        
-//        position.y = 0 // test
-        
-        let viewMatrix = makeLookAtCameraTransform(position: position, target: target, up: up)
-        let cameraToWorld = viewMatrix.inverse
-        
-        uniformsFlycamera.pointee.camera.worldToCamera = viewMatrix
-        uniformsFlycamera.pointee.camera.cameraToWorld = cameraToWorld
-        
-        let zNear = 0.0 
-        let zFar = 1.0 // image plane is located at zFar
-        let fieldOfView = Float(45.0) * .pi / Float(180.0) // 45 Degrees
-        let aspectRatio = Float(self.outputImageSize.width) / Float(self.outputImageSize.height)
-        let imagePlaneHeight = tanf(fieldOfView / Float(2.0 * zFar))
-        let imagePlaneWidth  = aspectRatio * imagePlaneHeight
-        
-        let scaleToImagePlane = simd_float4x4(scaleBy: SIMD3<Float>(imagePlaneWidth, imagePlaneHeight, 1))
-        var inversePerspective = matrix_identity_float4x4 // TODO: replace this for general perspectiveMatrix
-//        inversePerspective[2][2] = 1.0 // change to left hand coordinate system
-//        inversePerspective[3][2] = 1.0 // change to left hand coordinate system
-        
-        uniformsFlycamera.pointee.camera.NDCToCamera = inversePerspective * scaleToImagePlane
-        
-        // Inverse of viewport transformation in homogeneous coordinates
-        let viewportToNDC = simd_float4x4(columns: (simd_float4(2.0 / Float(self.outputImageSize.width), 0.0, 0.0, 0.0),
-                                                    simd_float4(0, -2.0 / Float(self.outputImageSize.height), 0.0, 0.0),
-                                                    simd_float4(0, 0, -1, 0.0),
-                                                    simd_float4(-1.0,   1.0,  0.0,  1.0)))
-        
-        uniformsFlycamera.pointee.camera.viewportToNDC = viewportToNDC
+                                                                                                                                        capacity: 1)
+
+        uniformsFlycamera.pointee.camera.cameraToWorld = self.camera.cameraToWorld
+        uniformsFlycamera.pointee.camera.viewportToCamera = self.camera.viewportToCamera
         
         uniformsFlycamera.pointee.width = UInt32(self.outputImageSize.width)
         uniformsFlycamera.pointee.height = UInt32(self.outputImageSize.height)
@@ -823,6 +776,8 @@ extension Renderer : MTKViewDelegate {
 //        self.updateCameraState()
         
 //        self.updateUniforms()
+        let windowSize = SIMD2<Float>(Float(self.outputImageSize.width), Float(self.outputImageSize.height))
+        updateCameraState(windowSize: windowSize)
         self.updateUniformsWithFlyCamera()
         
         // Launch a rectangular grid of threads on the GPU to perform ray tracing, with one thread per
@@ -898,14 +853,14 @@ extension Renderer : MTKViewDelegate {
             renderPassDescriptor.colorAttachments[0].texture = currentView.texture
             renderPassDescriptor.colorAttachments[0].loadAction = .clear
             renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
-    
+
             // Create a render command encoder.
             guard let blitEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
                 return
             }
             
             // Output views parameters
-//            let viewport = view.bounds
+            
 //            let width = Float(viewport.size.width)
 //            let height = Float(viewport.size.height)
 //            let aspectRatio = width / height
@@ -913,10 +868,10 @@ extension Renderer : MTKViewDelegate {
 //            print("view of size (\(width), \(height)) with aspect ratio \(aspectRatio)")
             
             // TODO: play with the viewport
-//            let zNear = 1e-2
-//            let zFar = 1000
-//            let viewport = MTLViewport(originX: 0.0, originY: 0.0, width: outputImageSize.width, height: outputImageSize.height, znear: zNear, zfar: zFar)
-            //blitEncoder.setViewport(<#T##viewport: MTLViewport##MTLViewport#>)
+//            let zNear : Double = 1e-2
+//            let zFar : Double = 1000
+//            let viewport = MTLViewport(originX: 0.0, originY: 0.0, width: Double(outputImageSize.width), height: Double(outputImageSize.height), znear: zNear, zfar: zFar)
+//            blitEncoder.setViewport(viewport)
             // drawing goes here -----------------------------------------------------------------------------------------------
             
             blitEncoder.setRenderPipelineState(blitPipelineState)

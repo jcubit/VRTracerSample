@@ -244,18 +244,18 @@ kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
         
         
         // set ray's direction in world space coordinates
-        float4 pInPixels  = float4(tid.x, tid.y, 1, 1); // as seen in the viewport space in homogeneous coordinates
-        float4 pNDC       = camera.viewportToNDC * pInPixels;
-        float4 pCamera    = camera.NDCToCamera * pNDC;
+        float4 pViewport  = float4(tid.x, tid.y, 1, 1); // as seen in the viewport space in homogeneous coordinates
+        float4 pCamera    = camera.viewportToCamera * pViewport;
+        pCamera.w = 1;
         
-//        float4 pWorld       = camera.cameraToWorld * pCamera;
-//        float4 rayDirection = pWorld - cameraPosition;
-//        ray.direction = normalize(float3(rayDirection.x, rayDirection.y, rayDirection.z));
+        float4 pWorld       = camera.cameraToWorld * pCamera;
+        float4 rayDirection = pWorld - cameraPosition;
+        ray.direction = normalize(float3(rayDirection.x, rayDirection.y, rayDirection.z));
         // we could have alternative compute the vector in camera space and transformed into world coordinates by
         // the affine trafo cameraToWorld
-        float4 dirInCameraSpace = float4(pCamera.x, pCamera.y, pCamera.z, 0);
-        float4 rayDirection = camera.cameraToWorld * dirInCameraSpace;
-        ray.direction = normalize(float3(rayDirection.x, rayDirection.y, rayDirection.z));
+//        float4 dirInCameraSpace = float4(pCamera.x, pCamera.y, pCamera.z, 0);
+//        float4 rayDirection = camera.cameraToWorld * dirInCameraSpace;
+//        ray.direction = normalize(float3(rayDirection.x, rayDirection.y, rayDirection.z));
 
 
         // Don't limit intersection distance.
@@ -287,10 +287,8 @@ kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
         // isn't using intersection functions, it doesn't need to include one.
         if (useIntersectionFunctions) {
             intersection = intersectorTest.intersect(ray, accelerationStructure, intersectionFunctionTable);
-//            intersection = intersectorTest.intersect(ray, accelerationStructure, 0, intersectionFunctionTable);
         } else {
             intersection = intersectorTest.intersect(ray, accelerationStructure);
-//            intersection = intersectorTest.intersect(ray, accelerationStructure, 0);
         }
         
         unsigned int instanceIndex = intersection.instance_id;
@@ -301,10 +299,6 @@ kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
             return;
         }
         else {
-            dstTex.write(float4(0.0f,1.0f,0.0f, 1.0f), tid);
-            //return; // we can stop here for a basic intersection test
-        
-        
         // The ray hit something. Look up the transformation matrix for this instance.
         float4x4 objectToWorldSpaceTransform(1.0f);
         
@@ -331,10 +325,7 @@ kernel void raytracingKernelFlyCamera(uint2 tid [[thread_position_in_grid]],
         color *= surfaceColor;
         
         dstTex.write(float4(color, 1.0f), tid);
-
         }
-        
-        
     }
 }
 

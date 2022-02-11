@@ -55,12 +55,15 @@ class ViewController: NSViewController {
         // Create scene
         let scene = Scene(device: selectedDevice)
         
-        
+        // Create camera for RT renderer
+        let windowSize = SIMD2<Float>(Float(mtkView.bounds.width), Float(mtkView.bounds.height))
+        let perspectiveCamera = PerspectiveCamera(cameraToWorld: self.camera.viewMatrix, windowSize: windowSize)
         
         // Create renderer with a cube scene
         renderer = Renderer(view: mtkView,
                             device: selectedDevice,
-                            scene: scene.newInstancedCubeScene(device: selectedDevice, useIntersectionFunctions: true))
+                            scene: scene.newInstancedCubeScene(device: selectedDevice, useIntersectionFunctions: true),
+                            camera: perspectiveCamera)
         
 //        print(mtkView.bounds.size)
 //        renderer.mtkView(mtkView, drawableSizeWillChange: mtkView.bounds.size)
@@ -95,7 +98,6 @@ class ViewController: NSViewController {
     
     func updateCamera() {
         
-
         let timeStep : Float = 1.0 / 60.0
         
         let cursorDeltaX = Float(currentMousePoint.x - previousMousePoint.x)
@@ -114,7 +116,7 @@ class ViewController: NSViewController {
                            rightPressed: rightPressed)
         
 
-        self.renderer.viewMatrix = self.camera.viewMatrix
+        self.renderer.camera.cameraToWorld = self.camera.cameraToWorld
                 
     }
     

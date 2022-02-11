@@ -12,20 +12,22 @@ public final class FlyCamera {
     /// position of the camera in world coordinates
     private var eye  = SIMD3<Float>(0.0, 1.5, -2.72)
     /// where the camera is looking at, i.e. look = target - eye
-    private var look = SIMD3<Float>(0.0, 0.0, 1.0)
+    private var look = -SIMD3<Float>(0.0, 1.5, -2.72)
     private var up   = SIMD3<Float>(0.0, 1.0, 0)
     
-    // speed of camera translation
+    /// speed of camera translation
     let eyeSpeed: Float = 6.0
-    // speed of camera rotation
-    let degreesPerCursorPoint: Float = 1.0
+    /// speed of camera rotation
+    let degreesPerCursorPoint: Float = 0.5
     let maxPitchRotationDegrees : Float = 89.0
     
-    // viewMatrix which is the in-out parameter of flythrough_camera_upate
+    /// viewMatrix, i.e. world to camera transformation
     var viewMatrix : simd_float4x4 {
-        get {
             return makeLookAtCameraTransform(position: eye, target: look + eye, up: up)
-        }
+    }
+    
+    var cameraToWorld: simd_float4x4 {
+        return makeCameraToWorld(position: eye, target: look + eye, up: up)
     }
     
     func update(timeStep: Float,
@@ -55,7 +57,7 @@ public final class FlyCamera {
         if cursorDelta.x != 0 {
             // rotation here is counter-clockwise because sin/cos are counter-clockwise
             // TODO: refactor this with simd_float3x3
-            let yaw = -cursorDelta.x * radians_from_degrees(degreesPerCursorPoint)
+            let yaw = -cursorDelta.x * toRadians(degrees: degreesPerCursorPoint)
             let yawRotation = simd_float4x4(rotationAroundAxis: up, by: yaw)
             let forward = yawRotation*SIMD4<Float>(look,1)
             look = normalize(SIMD3<Float>(forward.x, forward.y, forward.z))
