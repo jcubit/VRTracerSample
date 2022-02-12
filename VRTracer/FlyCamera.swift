@@ -19,7 +19,7 @@ public final class FlyCamera {
     let eyeSpeed: Float = 6.0
     /// speed of camera rotation
     let degreesPerCursorPoint: Float = 0.5
-    /// tolerance
+    /// minimum tolerance for maximal pitch angle
     let minTolerance : Float = cosf(toDegress(radians: 88))
     
     /// viewMatrix, i.e. world to camera transformation
@@ -31,13 +31,22 @@ public final class FlyCamera {
         return makeCameraToWorld(position: eye, target: look + eye, up: up)
     }
     
+    /// resets camera to initial pose
+    func resetState(resetPressed: Bool){
+        if resetPressed {
+            eye  = SIMD3<Float>(0.0, 1.5, -2.72)
+            look = -SIMD3<Float>(0.0, 1.5, -2.72)
+            up = SIMD3<Float>(0.0, 1.0, 0)
+        }
+    }
+    
     func update(timeStep: Float,
                 cursorDelta: SIMD2<Float>,
                 forwardPressed: Bool,
                 leftPressed: Bool,
                 backwardPressed: Bool,
                 rightPressed: Bool){
-
+        
         let rightDir = normalize(cross(look,up))
         let forward = normalize(look)
 
@@ -77,7 +86,5 @@ public final class FlyCamera {
                 look = requestedLook
             }
         }
-
-        
     }
-}
+} // class FlyCamera

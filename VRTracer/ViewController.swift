@@ -108,6 +108,10 @@ class ViewController: NSViewController {
         let leftPressed  = keysPressed[kVK_ANSI_A]
         let rightPressed  = keysPressed[kVK_ANSI_D]
         
+        let resetPressed = keysPressed[kVK_Space]
+        
+        self.camera.resetState(resetPressed: resetPressed)
+        
         self.camera.update(timeStep: timeStep,
                            cursorDelta: SIMD2<Float>(cursorDeltaX, cursorDeltaY),
                            forwardPressed: forwardPressed,
