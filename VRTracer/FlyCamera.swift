@@ -19,7 +19,8 @@ public final class FlyCamera {
     let eyeSpeed: Float = 6.0
     /// speed of camera rotation
     let degreesPerCursorPoint: Float = 0.5
-    let maxPitchRotationDegrees : Float = 89.0
+    /// tolerance
+    let minTolerance : Float = cosf(toDegress(radians: 88))
     
     /// viewMatrix, i.e. world to camera transformation
     var viewMatrix : simd_float4x4 {
@@ -56,15 +57,25 @@ public final class FlyCamera {
         // apply yaw rotation (rotating around y-axis so that the camera moves left or right)
         if cursorDelta.x != 0 {
             // rotation here is counter-clockwise because sin/cos are counter-clockwise
-            // TODO: refactor this with simd_float3x3
             let yaw = -cursorDelta.x * toRadians(degrees: degreesPerCursorPoint)
-            let yawRotation = simd_float4x4(rotationAroundAxis: up, by: yaw)
-            let forward = yawRotation*SIMD4<Float>(look,1)
-            look = normalize(SIMD3<Float>(forward.x, forward.y, forward.z))
+            let yawRotation = simd_float3x3(rotationAroundAxis: up, by: yaw)
+            let newLook = yawRotation * look
+            look = normalize(newLook)
+            // note that we do not update the rightDir here
+            // rightDir = normalize(cross(look,up))
         }
         // apply pitch rotation (rotating around x-axis so that camera moves up or down)
         if cursorDelta.y != 0 {
-            // TODO: complete 
+            let pitch = cursorDelta.y * toRadians(degrees: degreesPerCursorPoint)
+            let pitchRotation = simd_float3x3(rotationAroundAxis: rightDir, by: pitch)
+            let requestedLook = normalize(pitchRotation * look)
+            
+            let orthogonalRequestedLook = simd_float3x3(rotationAroundAxis: rightDir, by: 90) * requestedLook
+            let tolerance : Float = dot(orthogonalRequestedLook, up)
+
+            if (tolerance > 0.02){
+                look = requestedLook
+            }
         }
 
         

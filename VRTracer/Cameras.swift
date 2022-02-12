@@ -63,13 +63,13 @@ public final class PerspectiveCamera : ProjectiveCamera {
     }
 
     
-    /// Perspective camera constructor
+    /// Perspective camera initializer
     /// - Parameters:
     ///   - cameraToWorld: camera to world affine transformation
     ///   - windowSize: size of the be rendered window
     ///   - fieldOfViewY: Field of view with respect to the Y-axis in degrees
-    ///   - zNear: distance of the near plane with respect to the camera space
-    ///   - zFar: distance of the far plane with respect to the camera space
+    ///   - zNear: distance of the near plane in camera space
+    ///   - zFar: distance of the far plane in camera space
     init(cameraToWorld : simd_float4x4, windowSize: SIMD2<Float>, fieldOfViewY: Float = 45, zNear : Float = 0.01, zFar : Float = 1000) {
         self.cameraToWorld  = cameraToWorld
         self.windowSize     = windowSize

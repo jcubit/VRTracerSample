@@ -11,7 +11,10 @@ import simd
 extension simd_float4x4 {
     
     
-    /// initializer of a rotation matrix
+    /// initializer of an affine rotation transformation
+    ///
+    /// - Note: This initialization uses Rodriguez formula
+    ///
     /// - Parameters:
     ///   - axis: axis of rotation
     ///   - angle: angle of rotation in radians
@@ -44,10 +47,35 @@ extension simd_float4x4 {
 
 }
 
+extension simd_float3x3 {
+    
+    /// initializer of a 3x3 rotation matrix
+    ///
+    /// - Note: This initialization uses Rodriguez formula
+    ///
+    /// - Parameters:
+    ///   - axis: axis of rotation
+    ///   - angle: angle of rotation in radians
+    init(rotationAroundAxis axis: SIMD3<Float>, by angle: Float) {
+        let unitAxis = normalize(axis)
+        let ct = cosf(angle)
+        let st = sinf(angle)
+        let ci = 1 - ct
+        let x = unitAxis.x, y = unitAxis.y, z = unitAxis.z
+        self.init(columns:(SIMD3<Float>(    ct + x * x * ci, y * x * ci + z * st, z * x * ci - y * st),
+                           SIMD3<Float>(x * y * ci - z * st,     ct + y * y * ci, z * y * ci + x * st),
+                           SIMD3<Float>(x * z * ci + y * st, y * z * ci - x * st,     ct + z * z * ci)))
+    }
+    
+}
+
 func toRadians(degrees: Float) -> Float {
     return (degrees / Float(180.0)) * .pi
 }
 
+func toDegress(radians: Float) -> Float {
+    return (Float(180.0) * radians) / .pi
+}
 
 /// Gives a transformation from world to camera space. This function is particularly useful for placing a camera in the scene.
 ///
