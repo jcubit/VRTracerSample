@@ -32,21 +32,21 @@
 //};
 
 
-struct Camera {
-    simd_float3 position;
-    simd_float3 right;
-    simd_float3 up;
-    simd_float3 forward;
-};
-
-
-struct Uniforms
-{
-    unsigned int width;
-    unsigned int height;
-    unsigned int frameIndex;
-    struct Camera camera;
-};
+//struct Camera {
+//    simd_float3 position;
+//    simd_float3 right;
+//    simd_float3 up;
+//    simd_float3 forward;
+//};
+//
+//
+//struct Uniforms
+//{
+//    unsigned int width;
+//    unsigned int height;
+//    unsigned int frameIndex;
+//    struct Camera camera;
+//};
 
 
 struct FlyCamera {

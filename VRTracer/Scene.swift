@@ -59,10 +59,6 @@ public class Scene {
         let geometryMesh = Geometry(device: device)
         
         // set geometry mesh of cube
-//        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 0.0, y: 0.0, z: 1.0, w: 1), //SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
-//                                      transform: transform)
-//        geometryMesh.addCubeWithFaces(color: SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
-//                                      transform: transform)
         geometryMesh.addCubeWithFacesAndColor(color1: SIMD4<Float>(x: 0.725, y: 0.71, z: 0.68, w: 1),
                                               color2: SIMD4<Float>(x: 0.0, y: 1.0, z: 0.0, w: 1),
                                               color3: SIMD4<Float>(x: 0.0, y: 0.0, z: 1.0, w: 1),
@@ -201,9 +197,6 @@ public class Geometry : NSObject {
                 transform * SIMD4<Float>(x:  0.5, y: -0.5, z:  0.5, w: 1),
                 transform * SIMD4<Float>(x: -0.5, y:  0.5, z:  0.5, w: 1),
                 transform * SIMD4<Float>(x:  0.5, y:  0.5, z:  0.5, w: 1))
-        
-        // Try adding a different color for each side
-        //let colorFaceOne = SIMD4<Float>(x: 0.0, y: 1.0, z: 0.0, w: 1)
         
         addCubeFaceWithCubeVertices(color: color, cubeVertices: cubeVertices, i0: 0, i1: 2, i2: 6, i3: 4)
         

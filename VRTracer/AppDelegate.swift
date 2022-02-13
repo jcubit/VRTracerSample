@@ -5,7 +5,6 @@
 //
 
 import Cocoa
-import ImgProX
 
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {

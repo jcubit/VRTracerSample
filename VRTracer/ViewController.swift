@@ -49,7 +49,7 @@ class ViewController: NSViewController {
         
         
         // Specifies the pixel format to use for the buffer that will be rendered to the screen
-        // using .rgba32Float cannot be set in the contentViewController. TODO: Investigate why
+        // Currently, using .rgba32Float cannot be set in the contentViewController. TODO: has this change?
         mtkView.colorPixelFormat = .rgba16Float
         
         // Create scene
@@ -64,9 +64,6 @@ class ViewController: NSViewController {
                             device: selectedDevice,
                             scene: scene.newInstancedCubeScene(device: selectedDevice, useIntersectionFunctions: true),
                             camera: perspectiveCamera)
-        
-//        print(mtkView.bounds.size)
-//        renderer.mtkView(mtkView, drawableSizeWillChange: mtkView.bounds.size)
         
         mtkView.delegate = renderer
         
