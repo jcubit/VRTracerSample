@@ -60,8 +60,7 @@ class ViewController: NSViewController {
         let perspectiveCamera = PerspectiveCamera(cameraToWorld: self.camera.viewMatrix, windowSize: windowSize)
         
         // Create renderer with a cube scene
-        renderer = Renderer(view: mtkView,
-                            device: selectedDevice,
+        renderer = Renderer(device: selectedDevice,
                             scene: scene.newInstancedCubeScene(device: selectedDevice, useIntersectionFunctions: true),
                             camera: perspectiveCamera)
         

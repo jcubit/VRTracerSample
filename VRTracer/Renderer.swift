@@ -73,13 +73,13 @@ class Renderer : NSObject {
     public var camera : RTCamera
     
     
-    init(view: MTKView, device: MTLDevice, scene: Scene, camera: RTCamera){
+    init(device: MTLDevice, scene: Scene, camera: RTCamera){
 
         self.device = device
         self.scene = scene
         self.camera = camera
         
-        self.dispatchSemaphore = DispatchSemaphore(value: frameIndex)
+        self.dispatchSemaphore = DispatchSemaphore(value: maxBuffersInFlight)
         
         super.init()
         
@@ -638,13 +638,10 @@ extension Renderer : MTKViewDelegate {
     
     func draw(in view: MTKView) {
         
-        // TODO: Upate this with new raytracingPipeline with two accumulation targets
-        
-        // TODO: Search if there is a modern alternative to dispatch_semaphore_wait approach
         // The App uses the uniform buffer to stream uniform data to the GPU, so it
         // needs to wait until the GPU finishes processing the oldest GPU frame before
         // it can reuse that space in the buffer.
-//        dispatchSemaphore.wait(timeout: .distantFuture)
+        _ = dispatchSemaphore.wait(timeout: .distantFuture)
 
         
         // Create a command for the frame's commands.
